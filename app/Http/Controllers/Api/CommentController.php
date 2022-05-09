@@ -6,8 +6,11 @@ use App\Http\Controllers\ApiController;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Exceptions\ErrorException;
+use App\Models\Comment;
 use App\Models\Reaction;
 use Spatie\Valuestore\Valuestore;
+use Illuminate\Http\Request;
+
 
 class CommentController extends ApiController
 {
@@ -28,9 +31,9 @@ class CommentController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index(Request $request)
     {
-        $comments = Post::find($id)->comments()->with(['user'])->get();
+        $comments = Comment::with(['user', 'reactions'])->where('previous_id', $request->id)->orderby('id', 'desc')->get();
         return response()->json([
             'success' => true,
             'comments' => $comments,
@@ -44,30 +47,22 @@ class CommentController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store($id)
+    public function store(Request $request)
     {
-        $user = $this->currentUser();
-        $reaction = Reaction::where('reactiontable_id', $id)
-            ->where('user_id', $user->id);
-
-        if (!count($reaction->get())) {
-            $reaction = $user->reactions()->create([
-                'reactiontable_id' => $id,
-                'reactiontable_type' => 'App\Models\Post',
+        if ($request->type == 'post') {
+            $this->currentUser()->comments()->create([
+                'post_id' => $request->id,
+                'previous_id' => -1,
+                'text' => $request->text,
             ]);
-            return response()->json([
-                'success' => true,
-                'reaction' => $reaction,
-                'like' => true,
-            ], 200);
         } else {
-            $reaction->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'unlike success',
-                'like' => false,
-            ], 200);
+            $this->currentUser()->comments()->create([
+                'post_id' => -1,
+                'previous_id' => $request->id,
+                'text' => $request->text,
+            ]);
         }
+        return response()->json(['success' => 'successfully.']);
     }
 
     public function show(Post $post)

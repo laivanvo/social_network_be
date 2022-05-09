@@ -27,7 +27,8 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
     Route::post('/reactions', [ReactionController::class, 'index'])->name('reactions.index');
     Route::post('/reaction', [ReactionController::class, 'store'])->name('reactions.store');
-    Route::get('/comments/{id}', [CommentController::class, 'index'])->name('comments.index');
+    Route::post('/comments', [CommentController::class, 'index'])->name('comments.index');
+    Route::post('/comment', [CommentController::class, 'store'])->name('commentStore');
     Route::post('/upload', [PostController::class, 'upload'])->name('upload');
     Route::get('/file', [PostController::class, 'getFile'])->name('file');
     Route::get('/bgImage', [BgImageController::class, 'index'])->name('bgImage.index');

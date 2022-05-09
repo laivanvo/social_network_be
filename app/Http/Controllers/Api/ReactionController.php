@@ -12,17 +12,6 @@ use Illuminate\Http\Request;
 
 class ReactionController extends ApiController
 {
-    private $audiences = [];
-    private $paginationNum = 0;
-    private $levelParent = 1;
-
-    public function __construct()
-    {
-        $this->middleware('verified');
-        $this->audiences = Post::getAudiences();
-        $settings = Valuestore::make(storage_path('app/settings.json'));
-        $this->paginationNum = $settings->get('post_pagination', 0);
-    }
 
     /**
      * Display a listing of the resource.
@@ -61,8 +50,8 @@ class ReactionController extends ApiController
         $type = $request->type == 'post' ? 'App\Models\Post' : 'App\Models\Comment';
         $user = $this->currentUser();
         $reaction = Reaction::where('reactiontable_id', $request->id)
-                ->where('user_id', $user->id)
-                ->where('reactiontable_type', $type);
+            ->where('user_id', $user->id)
+            ->where('reactiontable_type', $type);
         if (!count($reaction->get())) {
             $reaction = $user->reactions()->create([
                 'reactiontable_id' => $request->id,

@@ -29,24 +29,7 @@ class CommentObserve
        //
     }
 
-    public function saved(Comment $comment)
-    {
-        $idUserPost = $this->post->find($comment->post_id)->user_id;
-        $userRequest = $this->user->find($idUserPost);
-        if (empty($userRequest)) {
-            return;
-        }
-        $isNoti = $userRequest->setting()->first();
-        if ($isNoti->is_noti != 1) {
-            return;
-        }
-        $comment->notification()->create([
-            'users_id_to' => Auth::id(),
-            'user_id_from' => $idUserPost,
-            "action" => "comment",
-            "data" => Auth::user()->name." just comment post for you with ".$comment->content,
-        ]);
-    }
+
     /**
      * Handle the Comment "updated" event.
      *

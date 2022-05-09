@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\ApiController;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
@@ -32,7 +34,18 @@ class PostController extends ApiController
      */
     public function index()
     {
-        $posts = Post::with(['user', 'bgImage'])->get();
+        $posts = Post::with([
+            'user',
+            'bgImage',
+            'comments',
+            'comments.user',
+            'comments.reactions',
+            'comments.reactions.user',
+            'reactions',
+            'reactions.user',
+        ])
+            ->orderby('id', 'desc')
+            ->get();
         return response()->json([
             'success' => true,
             'posts' => $posts,
@@ -52,9 +65,9 @@ class PostController extends ApiController
         if ($request->file()) {
             $file_name = time() . '_' . $request->file->getClientOriginalName();
             $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
-            $fileUpload->name =$request->file->getClientOriginalName();
+            $fileUpload->name = $request->file->getClientOriginalName();
             $fileUpload->path = '/storage/' . $file_path;
-            $fileUpload->type = substr($request->file->getClientMimeType(),0,5);
+            $fileUpload->type = substr($request->file->getClientMimeType(), 0, 5);
             $fileUpload->save();
             return response()->json(['success' => 'File uploaded successfully.']);
         }
@@ -73,7 +86,7 @@ class PostController extends ApiController
             $file_name = time() . '_' . $request->file->getClientOriginalName();
             $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
             $post->file = '/storage/' . $file_path;
-            $post->type = substr($request->file->getClientMimeType(),0,5);
+            $post->type = substr($request->file->getClientMimeType(), 0, 5);
         } else {
             $post->type = 'text';
         }
@@ -97,7 +110,7 @@ class PostController extends ApiController
             $file_name = time() . '_' . $request->file->getClientOriginalName();
             $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
             $post->file = '/storage/' . $file_path;
-            $post->type = substr($request->file->getClientMimeType(),0,5);
+            $post->type = substr($request->file->getClientMimeType(), 0, 5);
         } else {
             $post->type = 'text';
         }

@@ -37,7 +37,7 @@ class Comment extends Model
         $query->where('level', $level);
     }
 
-    protected $fillable = ['user_id', 'previous_id', 'level', 'post_id', 'content', 'id'];
+    protected $fillable = ['user_id', 'previous_id', 'post_id', 'text', 'id'];
 
     public function notification()
     {
