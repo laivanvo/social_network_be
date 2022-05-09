@@ -14,8 +14,6 @@ class Post extends Model
     private static $audiences = [
         'public' => 'Public',
         'private' => 'Private',
-        'onlyme' => 'Only me',
-        'friends' => 'Friends',
     ];
 
     public static function getAudiences()
@@ -26,6 +24,11 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function bgImage()
+    {
+        return $this->belongsTo(BgImage::class);
     }
 
     /**
