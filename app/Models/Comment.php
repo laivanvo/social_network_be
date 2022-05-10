@@ -22,9 +22,14 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function replies()
+    public function replie()
     {
         return $this->hasMany(Comment::Class, 'previous_id', 'id');
+    }
+
+    public function replies()
+    {
+        return $this->replie()->orderby('id', 'desc');
     }
 
     public function reactions()

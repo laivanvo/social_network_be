@@ -65,9 +65,14 @@ class Post extends Model
         return in_array($audience, array_flip(self::$audiences));
     }
 
-    public function comments()
+    public function comment()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function comments()
+    {
+        return $this->comment()->orderby('id', 'desc');
     }
 
     public function reactions()

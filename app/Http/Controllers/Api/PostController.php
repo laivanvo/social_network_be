@@ -15,17 +15,6 @@ use App\Models\BgImage;
 
 class PostController extends ApiController
 {
-    private $audiences = [];
-    private $paginationNum = 0;
-    private $levelParent = 1;
-
-    public function __construct()
-    {
-        $this->middleware('verified');
-        $this->audiences = Post::getAudiences();
-        $settings = Valuestore::make(storage_path('app/settings.json'));
-        $this->paginationNum = $settings->get('post_pagination', 0);
-    }
 
     /**
      * Display a listing of the resource.
@@ -39,8 +28,16 @@ class PostController extends ApiController
             'bgImage',
             'comments',
             'comments.user',
+            'comments.replies',
+            'comments.replies.user',
+            'comments.replies.replies',
+            'comments.replies.replies.user',
             'comments.reactions',
             'comments.reactions.user',
+            'comments.replies.reactions',
+            'comments.replies.reactions.user',
+            'comments.replies.replies.reactions',
+            'comments.replies.replies.reactions.user',
             'reactions',
             'reactions.user',
         ])
