@@ -14,17 +14,6 @@ use Illuminate\Http\Request;
 
 class CommentController extends ApiController
 {
-    private $audiences = [];
-    private $paginationNum = 0;
-    private $levelParent = 1;
-
-    public function __construct()
-    {
-        $this->middleware('verified');
-        $this->audiences = Post::getAudiences();
-        $settings = Valuestore::make(storage_path('app/settings.json'));
-        $this->paginationNum = $settings->get('post_pagination', 0);
-    }
 
     /**
      * Display a listing of the resource.
@@ -33,9 +22,16 @@ class CommentController extends ApiController
      */
     public function index(Request $request)
     {
-        $comments = Comment::with(['user', 'reactions'])->where('previous_id', $request->id)->orderby('id', 'desc')->get();
+        if ($request->type == 'post') {
+            $comments = Comment::with(['user'])->where('post_id', $request->id)->paginate(2);
+            $count = Comment::where('post_id', $request->id);
+        } else {
+            $comments = Comment::with(['user'])->where('previous_id', $request->id)->paginate(2);
+            $count = Comment::where('previous_id', $request->id);
+        }
         return response()->json([
             'success' => true,
+            'count' => $count,
             'comments' => $comments,
         ], 200);
     }

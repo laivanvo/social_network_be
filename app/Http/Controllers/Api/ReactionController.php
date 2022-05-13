@@ -26,15 +26,14 @@ class ReactionController extends ApiController
             ->where('reactiontable_id', $request->id)
             ->where('reactiontable_type', $type)
             ->get();
-        $like = count($reaction_user) ? true : false;
+        $isLike = count($reaction_user) ? true : false;
         $reactions = Reaction::where('reactiontable_id', $request->id)
             ->where('reactiontable_type', $type)
             ->get();
         return response()->json([
             'success' => true,
-            'reactions' => $reactions,
-            'count_like' => count($reactions),
-            'like' => $like,
+            'count' => count($reactions),
+            'isLike' => $isLike,
         ], 200);
     }
 

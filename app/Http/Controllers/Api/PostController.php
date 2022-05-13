@@ -25,24 +25,9 @@ class PostController extends ApiController
     {
         $posts = Post::with([
             'user',
-            'bgImage',
-            'comments',
-            'comments.user',
-            'comments.replies',
-            'comments.replies.user',
-            'comments.replies.replies',
-            'comments.replies.replies.user',
-            'comments.reactions',
-            'comments.reactions.user',
-            'comments.replies.reactions',
-            'comments.replies.reactions.user',
-            'comments.replies.replies.reactions',
-            'comments.replies.replies.reactions.user',
-            'reactions',
-            'reactions.user',
         ])
             ->orderby('id', 'desc')
-            ->get();
+            ->paginate(2);
         return response()->json([
             'success' => true,
             'posts' => $posts,
