@@ -56,25 +56,11 @@ class ReactionController extends ApiController
                 'reactiontable_id' => $request->id,
                 'reactiontable_type' => $type,
             ]);
-            if ($request->type == 'post') {
-                $post = Post::findOrFail($request->id);
-                $post->count_reaction++;
-            } else {
-                $comment = Comment::findOrFail($request->id);
-                $comment->count_reaction++;
-            }
             return response()->json([
                 'success' => true,
                 'message' => 'like success',
             ], 200);
         } else {
-            if ($request->type == 'post') {
-                $post = Post::findOrFail($request->id);
-                $post->count_reaction--;
-            } else {
-                $comment = Comment::findOrFail($request->id);
-                $comment->count_reaction--;
-            }
             $reaction->delete();
             return response()->json([
                 'success' => true,

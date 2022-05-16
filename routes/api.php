@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\BgImageController;
 use App\Http\Controllers\Api\ReactionController;
 use App\Http\Controllers\Api\CommentController;
-use App\Models\Post;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +33,9 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/file', [PostController::class, 'getFile'])->name('file');
     Route::get('/bgImage', [BgImageController::class, 'index'])->name('bgImage.index');
     Route::get('/posts', [PostController::class, 'index'])->name('post.index');
-    Route::post('/post', [PostController::class, 'store'])->name('post.store');
-    Route::get('/post', [PostController::class, 'destroy'])->name('post.destroy');
-    Route::post('/postUpdate', [PostController::class, 'update'])->name('post.update');
+    Route::post('/posts', [PostController::class, 'store'])->name('post.store');
+    Route::post('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
 
 
 });

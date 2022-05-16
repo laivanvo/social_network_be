@@ -75,7 +75,7 @@ class PostController extends ApiController
         $post->audience = $request->audience;
         $post->text = $request->text;
         $post->bg_image_id = $request->bg;
-        $post->count_reaction = 0;
+        $post->count_comment = 0;
         $post->save();
         return response()->json([
             'success' => 'create post successfully.',
@@ -164,13 +164,10 @@ class PostController extends ApiController
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        if ($post->user_id != $this->currentUser()->id) {
-            throw new ErrorException();
-        }
-        $post->delete();
-        return redirect(route("posts.index"));
+        $this->currentUser()->posts()->findOrFail($id)->delete();
+        return response()->json(['success' => 'create post successfully.']);
     }
 
     /**

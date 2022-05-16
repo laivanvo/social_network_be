@@ -29,8 +29,8 @@
         </ul>
     </div>
     <div class="col-4 d-flex">
-        @include('app.profile.profile-show')
-        @include('app.profile.profile-edit')
+        {{-- @include('app.profile.profile-show') --}}
+        {{-- @include('app.profile.profile-edit') --}}
         <a class="text-black w-20 text-decoration-none mt-2" href="{{ route('auth.logout') }}">Logout</a>
         <div class="dropdown mt-2 ms-2">
             <div class="btn dropdown-toggle p-0" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">

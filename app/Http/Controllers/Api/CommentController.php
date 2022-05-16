@@ -52,18 +52,27 @@ class CommentController extends ApiController
     public function store(Request $request)
     {
         if ($request->type == 'post') {
-            $comment = $this->currentUser()->comments()->create([
+            $this->currentUser()->comments()->create([
                 'post_id' => $request->id,
                 'previous_id' => -1,
                 'text' => $request->text,
+                'count_rep' => 0,
             ]);
+            $post = Post::findOrFail($request->id);
+            $post->count_comment++;
+            $post->save();
         } else {
-            $comment = $this->currentUser()->comments()->create([
+            $this->currentUser()->comments()->create([
                 'post_id' => -1,
                 'previous_id' => $request->id,
                 'text' => $request->text,
+                'count_rep' => 0,
             ]);
+            $commentz = Comment::findOrFail($request->id);
+            $commentz->count_comment++;
+            $commentz->save();
         }
+        $comment = Comment::OrderBy('id', 'desc')->with(['user'])->first();
         return response()->json([
             'success' => 'successfully.',
             'comment' => $comment,
@@ -102,8 +111,17 @@ class CommentController extends ApiController
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+        if ($request->type = 'post') {
+            $post = Post::findOrFail($request->id);
+            $post->count_comment--;
+            $post->save();
+        } else {
+            $commentz = Comment::findOrFail($request->id);
+            $commentz->count_comment--;
+            $commentz->save();
+        }
         $this->currentUser()->comments()->findOrFail($id)->delete();
         return response()->json([
             'success' => 'successfully',
