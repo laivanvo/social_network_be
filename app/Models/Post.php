@@ -16,6 +16,22 @@ class Post extends Model
         'private' => 'Private',
     ];
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+
+    protected $fillable = [
+        'user_id',
+        'audience',
+        'text',
+        'bg_image_id',
+        'file',
+        'type',
+        'count_reaction',
+    ];
+
     public static function getAudiences()
     {
         return self::$audiences;
@@ -37,10 +53,6 @@ class Post extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeNewestPosts($query)
-    {
-        $query->where('display', 1)->orderBy('created_at', 'desc');
-    }
 
     public function scopeIsPublic($query)
     {
@@ -79,8 +91,6 @@ class Post extends Model
     {
         return $this->morphMany(Reaction::class, 'reactiontable');
     }
-
-    protected $fillable = ['user_id', 'content', 'display', 'audience'];
 
     public function getPostIsExitComment($id)
     {

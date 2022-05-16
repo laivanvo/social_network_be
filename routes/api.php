@@ -23,17 +23,20 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('auth.login')->withoutMiddleware('auth:api');
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::put('profile/update', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/posts', [PostController::class, 'index'])->name('reactions.index');
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
     Route::post('/reactions', [ReactionController::class, 'index'])->name('reactions.index');
     Route::post('/reaction', [ReactionController::class, 'store'])->name('reactions.store');
     Route::post('/comments', [CommentController::class, 'index'])->name('comments.index');
     Route::post('/comment', [CommentController::class, 'store'])->name('commentStore');
+    Route::post('/comments/{id}', [CommentController::class, 'update'])->name('Comment.update');
+    Route::get('/comments/{id}', [CommentController::class, 'destroy'])->name('Comment.destroy');
     Route::post('/upload', [PostController::class, 'upload'])->name('upload');
     Route::get('/file', [PostController::class, 'getFile'])->name('file');
     Route::get('/bgImage', [BgImageController::class, 'index'])->name('bgImage.index');
-    Route::post('/post', [PostController::class, 'store'])->name('postStore');
-    Route::post('/postUpdate', [PostController::class, 'update'])->name('postUpdate');
+    Route::get('/posts', [PostController::class, 'index'])->name('post.index');
+    Route::post('/post', [PostController::class, 'store'])->name('post.store');
+    Route::get('/post', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::post('/postUpdate', [PostController::class, 'update'])->name('post.update');
 
 
 });

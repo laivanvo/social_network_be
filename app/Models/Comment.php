@@ -42,7 +42,7 @@ class Comment extends Model
         $query->where('level', $level);
     }
 
-    protected $fillable = ['user_id', 'previous_id', 'post_id', 'text', 'id'];
+    protected $fillable = ['user_id', 'previous_id', 'post_id', 'text', 'id', 'count_reaction'];
 
     public function notification()
     {

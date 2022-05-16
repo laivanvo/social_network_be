@@ -75,8 +75,12 @@ class PostController extends ApiController
         $post->audience = $request->audience;
         $post->text = $request->text;
         $post->bg_image_id = $request->bg;
+        $post->count_reaction = 0;
         $post->save();
-        return response()->json(['success' => 'create post successfully.']);
+        return response()->json([
+            'success' => 'create post successfully.',
+            'post' => $post,
+        ]);
     }
 
     public function update(Request $request)
@@ -131,10 +135,6 @@ class PostController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        return view('app.post-create-update', ['user' => $this->currentUser(), 'audiences' => $this->audiences]);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -143,31 +143,12 @@ class PostController extends ApiController
      * @return \Illuminate\Http\Response
      */
 
-    public function show(Post $post)
-    {
-        $post->audience = Post::getAudienceValue($post->audience);
-        return view("app.detail-post", [
-            'post' => $post,
-            'user' => $this->currentUser(),
-            'paginationNum' => $this->paginationNum,
-            'levelParent' => $this->levelParent,
-        ]);
-    }
-
     /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post)
-    {
-        return view('app.post-create-update', [
-            'user' => $this->currentUser(),
-            'audiences' => $this->audiences,
-            'post' => $post
-        ]);
-    }
 
     /**
      * Update the specified resource in storage.

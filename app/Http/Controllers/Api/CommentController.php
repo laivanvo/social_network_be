@@ -23,10 +23,16 @@ class CommentController extends ApiController
     public function index(Request $request)
     {
         if ($request->type == 'post') {
-            $comments = Comment::with(['user'])->where('post_id', $request->id)->paginate(2);
+            $comments = Comment::with(['user'])
+            ->where('post_id', $request->id)
+            ->orderBy('id', 'desc')
+            ->paginate(2);
             $count = Comment::where('post_id', $request->id);
         } else {
-            $comments = Comment::with(['user'])->where('previous_id', $request->id)->paginate(2);
+            $comments = Comment::with(['user'])
+            ->where('previous_id', $request->id)
+            ->orderBy('id', 'desc')
+            ->paginate(2);
             $count = Comment::where('previous_id', $request->id);
         }
         return response()->json([
@@ -46,19 +52,22 @@ class CommentController extends ApiController
     public function store(Request $request)
     {
         if ($request->type == 'post') {
-            $this->currentUser()->comments()->create([
+            $comment = $this->currentUser()->comments()->create([
                 'post_id' => $request->id,
                 'previous_id' => -1,
                 'text' => $request->text,
             ]);
         } else {
-            $this->currentUser()->comments()->create([
+            $comment = $this->currentUser()->comments()->create([
                 'post_id' => -1,
                 'previous_id' => $request->id,
                 'text' => $request->text,
             ]);
         }
-        return response()->json(['success' => 'successfully.']);
+        return response()->json([
+            'success' => 'successfully.',
+            'comment' => $comment,
+        ]);
     }
 
     public function show(Post $post)
@@ -73,40 +82,18 @@ class CommentController extends ApiController
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        return view('app.post-create-update', [
-            'user' => $this->currentUser(),
-            'audiences' => $this->audiences,
-            'post' => $post
-        ]);
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(PostRequest $request, Post $post)
+    public function update($id, Request  $request)
     {
-        if (
-            !Post::checkAudience($request->audience)
-            || $post->user_id !== $this->currentUser()->id
-        ) {
-            throw new ErrorException();
-        }
-        $post->update([
-            'content' => $request->content,
-            'audience' => $request->audience,
+        $comment = $this->currentUser()->comments()->findOrFail($id)->update($request->all());
+        return response()->json([
+            'success' => 'successfully',
         ]);
-        return redirect()->route('posts.index');
     }
 
     /**
@@ -115,13 +102,12 @@ class CommentController extends ApiController
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        if ($post->user_id != $this->currentUser()->id) {
-            throw new ErrorException();
-        }
-        $post->delete();
-        return redirect(route("posts.index"));
+        $this->currentUser()->comments()->findOrFail($id)->delete();
+        return response()->json([
+            'success' => 'successfully',
+        ]);
     }
 
     /**
