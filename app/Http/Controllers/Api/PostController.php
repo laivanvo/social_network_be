@@ -62,7 +62,7 @@ class PostController extends ApiController
         //     'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
         // ]);
 
-        $post = new Post;
+        $post = new Post();
         $post->user_id = $this->currentUser()->id;
         if ($request->file()) {
             $file_name = time() . '_' . $request->file->getClientOriginalName();
@@ -74,7 +74,7 @@ class PostController extends ApiController
         }
         $post->audience = $request->audience;
         $post->text = $request->text;
-        $post->bg_image_id = $request->bg;
+        $post->bg_image = $request->bg;
         $post->count_comment = 0;
         $post->save();
         return response()->json([
@@ -83,14 +83,14 @@ class PostController extends ApiController
         ]);
     }
 
-    public function update(Request $request)
+    public function update($id, Request $request)
     {
 
         // $request->validate([
         //     'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
         // ]);
 
-        $post = Post::find($request->id);
+        $post = Post::find($id);
         $post->user_id = $this->currentUser()->id;
         if ($request->file()) {
             $file_name = time() . '_' . $request->file->getClientOriginalName();
@@ -102,9 +102,12 @@ class PostController extends ApiController
         }
         $post->audience = $request->audience;
         $post->text = $request->text;
-        $post->bg_image_id = $request->bg;
+        $post->bg_image = $request->bg;
         $post->save();
-        return response()->json(['success' => 'create post successfully.']);
+        return response()->json([
+            'post' => $post,
+            'success' => 'create post successfully.'
+        ]);
     }
 
 
