@@ -69,7 +69,7 @@ class CommentController extends ApiController
                 'count_rep' => 0,
             ]);
             $commentz = Comment::findOrFail($request->id);
-            $commentz->count_comment++;
+            $commentz->count_rep++;
             $commentz->save();
         }
         $comment = Comment::OrderBy('id', 'desc')->with(['user'])->first();

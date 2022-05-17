@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\BgImageController;
 use App\Http\Controllers\Api\ReactionController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\RelationshipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,9 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('post.store');
     Route::post('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
-
+    Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
+    Route::post('/relations/send/{id}', [RelationshipController::class, 'sendRequest'])->name('relationship.send');
+    Route::post('/relations/res/{id}', [RelationshipController::class, 'response'])->name('relationship.response');
+    Route::get('/relations', [RelationshipController::class, 'list'])->name('relationship.list');
 
 });

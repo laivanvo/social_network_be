@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\App\ReactionController;
 use App\Http\Controllers\NoticesController;
+use App\Http\Controllers\Api\RelationshipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('profile/upload', [ ProfileController::class, 'upload' ])->name('profile.upload');
 
-    Route::get('/relations', [RelationController::class, 'getAddFriendList'])->name('relations.get_add_friend_list');
+    // Route::get('/relations', [RelationController::class, 'getAddFriendList'])->name('relations.get_add_friend_list');
     Route::post('/relations/{relation}', [RelationController::class, 'addFriend'])->name('relations.add_friend');
     Route::get('/relations/requests', [RelationController::class, 'getRequests'])->name('relations.get_requests');
     Route::patch('/relations/{relation}', [RelationController::class, 'responseRequest'])->name('relations.response_request');
@@ -59,4 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/settings', [SettingController::class, 'changeSettings'])->name('settings.change_settings');
     Route::resource('reactions', ReactionController::class);
     Route::resource('notices', NoticesController::class);
+
 });
+
+Route::get('/relations', [RelationshipController::class, 'index'])->name('relationsmyfriend');

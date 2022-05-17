@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\Relation;
+use App\Models\Comment;
 use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
@@ -19,6 +22,8 @@ class AuthController extends Controller
      */
     public function login()
     {
+        $relation = User::find(1)->requestToMes()->where('from', 2)->first();
+        dd($relation);
         return view('auth.login');
     }
 

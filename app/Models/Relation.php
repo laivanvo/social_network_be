@@ -2,30 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use App\Models\Notification;
 
-class Relation extends Pivot
+class Relation extends Model
 {
-    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $table = "relations";
-    protected $fillable = ['friend_id', 'type', 'id'];
 
-    public function notification()
+    protected $fillable = [
+        'from',
+        'to',
+        'type',
+    ];
+
+    public function userFrom()
     {
-        return $this->morphOne(Notification::class, "notifiable");
+        return $this->belongsTo(User::class, 'from', 'id');
     }
 
-    public function scopeGetIdRequestAddFriend($query)
+    public function userTo()
     {
-        return $query->orderBy("id", 'desc')->where("type", "request")->first()->id;
+        return $this->belongsTo(User::class, 'to', 'id');
     }
 }

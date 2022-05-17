@@ -29,7 +29,7 @@ class Post extends Model
         'bg_image_id',
         'file',
         'type',
-        'count_reaction',
+        'count_comment',
     ];
 
     public static function getAudiences()

@@ -185,4 +185,14 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
     {
         return [];
     }
+
+    public function requestByMes()
+    {
+        return $this->hasMany(Relation::class, 'from', 'id');
+    }
+
+    public function requestToMes()
+    {
+        return $this->hasMany(Relation::class, 'to', 'id');
+    }
 }

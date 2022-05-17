@@ -21,47 +21,9 @@ class FriendObserve
      * @param  \App\Models\Relation  $relation
      * @return void
      */
-    public function created(Relation $relation)
-    {
-        $userRequest = $this->user->find($relation->friend_id);
-        $relation->id = $relation->getIdRequestAddFriend();
-        if (empty($userRequest)) {
-            return;
-        }
-        $isNoti = $userRequest->setting()->first();
-        if ($isNoti->is_noti != 1) {
-            return;
-        }
-        $relation->notification()->create([
-            'action' => "require",
-            'users_id_to' => Auth::id(),
-            "data" => Auth::user()->name." just send addfriend",
-            'user_id_from' => $relation->friend_id,
-            "notifiable_id" => $relation->getIdRequestAddFriend(),
-        ]);
-    }
 
-    public function updated(Relation $relation)
-    {
-        $userRequest = $this->user->find($relation->user_id);
-        $relation->id = $relation->getIdRequestAddFriend();
-        if (empty($userRequest)) {
-            return;
-        }
-        $isNoti = $userRequest->setting()->first();
-        if ($isNoti->is_noti != 1) {
-            return;
-        }
-        if ($relation->isDirty('type')) {
-            $relation->notification()->create([
-            'action' => "accept",
-            "data" => Auth::user()->name." just accept addfriend",
-            'users_id_to' => Auth::id(),
-            'user_id_from' => $relation->user_id,
-            "notifiable_id" => $relation->getIdRequestAddFriend(),
-            ]);
-        }
-    }
+
+
     /**
      * Handle the Relation "deleted" event.
      *
