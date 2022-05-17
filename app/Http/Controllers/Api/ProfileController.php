@@ -10,8 +10,11 @@ class ProfileController extends ApiController
 {
     public function index()
     {
-        $profile = $this->currentUser()->profile;
-        return $this->responseSuccess($profile);
+        $profile = $this->currentUser()->profile()->first();
+        return response()->json([
+            'success' => true,
+            'profile' => $profile,
+        ], 200);
     }
 
     public function update(ProfileValidate $request)
