@@ -38,5 +38,5 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('/relations/res/{id}', [RelationshipController::class, 'response'])->name('relationship.response');
     Route::get('/relations', [RelationshipController::class, 'list'])->name('relationship.list');
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
-
+    Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
 });

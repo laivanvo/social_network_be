@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Requests\PostRequest;
 use App\Models\Post;
-use App\Exceptions\ErrorException;
-use Spatie\Valuestore\Valuestore;
 use App\Models\FileUpload;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use App\Models\BgImage;
 

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\ProfileValidate;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ApiController;
+use Illuminate\Http\Request;
 
 class ProfileController extends ApiController
 {
@@ -17,33 +16,24 @@ class ProfileController extends ApiController
         ], 200);
     }
 
-    public function update(ProfileValidate $request)
+    public function update(Request $request)
     {
-        $profile = $this->currentUser()->profile;
-        if ($request->hasFile('avatar')
-            && $profile->avatar
-            && Storage::exists('images/'.$profile->avatar)
-        ) {
-            Storage::delete('images/'.$profile->avatar);
+        $profile = $this->currentUser()->profile()->first();
+        if ($request->file()) {
+            $file_name = time() . '_' . $request->file->getClientOriginalName();
+            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+            $profile->avatar = '/storage/' . $file_path;
         }
-        if ($request->hasFile('avatar')) {
-            $imageName = time().'.'.$request->avatar->extension();
-            $request->avatar->storeAs('images', $imageName, 'public');
-        } else {
-            $imageName = $profile->avatar;
-        }
-        $this->currentUser()->profile()->update([
-            'first_name' => $request->firstname,
-            'last_name' => $request->lastname,
-            'phone_number' => $request->phone,
-            'birthday' => $request->birthday,
-            'address' => $request->address,
-            'gender' => $request->gender,
-            'avatar' => $imageName,
-        ]);
-        return $this->responseSuccess([
-            'message' => 'Update successfully',
-            'avatar' => $imageName,
+        $profile->first_name = $request->first_name;
+        $profile->last_name = $request->last_name;
+        $profile->phone_number = $request->phone_number;
+        $profile->birthday = $request->birthday;
+        $profile->address = $request->address;
+        $profile->gender = $request->gender;
+        $profile->save();
+        return response()->json([
+            'profile' => $profile,
+            'success' => 'update profile successfully.'
         ]);
     }
 }
