@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Post;
-use App\Models\FileUpload;
+use App\Models\group;
 use Illuminate\Http\Request;
-use App\Models\BgImage;
 
 
-class PostController extends ApiController
+class GroupController extends ApiController
 {
 
     /**
@@ -19,15 +17,10 @@ class PostController extends ApiController
      */
     public function index()
     {
-        $posts = Post::with([
-            'user',
-        ])
-            ->orderby('id', 'desc')
-            ->paginate(2);
+        $groups = Group::all();
         return response()->json([
             'success' => true,
-            'posts' => $posts,
-            'user' => $this->currentUser()
+            'groups' => $groups,
         ], 200);
     }
 

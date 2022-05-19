@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\BgImageController;
 use App\Http\Controllers\Api\ReactionController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\RelationshipController;
+use App\Http\Controllers\Api\GroupController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,7 @@ use App\Http\Controllers\Api\RelationshipController;
 */
 Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('auth.login')->withoutMiddleware('auth:api');
+    Route::post('register', [AuthController::class, 'register'])->name('auth.register')->withoutMiddleware('auth:api');
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
     Route::post('/reactions', [ReactionController::class, 'index'])->name('reactions.index');
     Route::post('/reaction', [ReactionController::class, 'store'])->name('reactions.store');
@@ -36,7 +39,11 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
     Route::post('/relations/send/{id}', [RelationshipController::class, 'sendRequest'])->name('relationship.send');
     Route::post('/relations/res/{id}', [RelationshipController::class, 'response'])->name('relationship.response');
-    Route::get('/relations', [RelationshipController::class, 'list'])->name('relationship.list');
+    Route::get('/relations', [RelationshipController::class, 'listRequest'])->name('relationship.list');
+    Route::get('/relations/address', [RelationshipController::class, 'listFriendByAddress'])->name('relationship.listFriendByAddress');
+    Route::get('/relations/friend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
+    Route::get('/relations/birth', [RelationshipController::class, 'listFriendByBirthday'])->name('relationship.listFriendByBirthday');
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/groups', [GroupController::class, 'index'])->name('group.index');
 });

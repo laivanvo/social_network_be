@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\ApiController;
 use App\Models\Post;
 use App\Models\FileUpload;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Models\Relation;
+
 
 class RelationshipController extends ApiController
 {
@@ -42,7 +44,6 @@ class RelationshipController extends ApiController
             'type' => 'none',
             'success' => 'send request successfully.'
         ]);
-
     }
 
     /**
@@ -50,9 +51,70 @@ class RelationshipController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function list()
+    public function listRequest()
     {
-        $relations = $this->currentUser()->requestToMes()->with(['userFrom'])->where('type', 'request')->get();
+        $from = $this->currentUser()->requestToMes()->where('type', 'request')->pluck('from');
+        $relations = Profile::whereIn('user_id', $from)->get();
+        return response()->json([
+            'relations' => $relations,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
+    public function listFriend()
+    {
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from');
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to');
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        $relations = Profile::whereIn('user_id', $from)->get();
+        return response()->json([
+            'relations' => $relations,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
+    public function listFriendByAddress()
+    {
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from');
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to');
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        $relations = Profile::whereIn('user_id', $from)->where('address', $this->currentUser()->profile->address)->get();
+        return response()->json([
+            'relations' => $relations,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
+    public function listFriendByBirthday()
+    {
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from');
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to');
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        $relations = Profile::whereIn('user_id', $from)->where('birthday', $this->currentUser()->profile->birthday)->get();
         return response()->json([
             'relations' => $relations,
             'success' => 'send request successfully.'

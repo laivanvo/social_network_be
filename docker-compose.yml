@@ -40,12 +40,12 @@ services:
     ports:
       - 1025:1025
       - 8025:8025
-  cron:
-    build: ./docker-dev/cron
-    command: crond -f
-    volumes:
-      - .:/app
-      - composer_caches:/app/vendor
+  # cron:
+  #   build: ./docker-dev/cron
+  #   command: crond -f
+  #   volumes:
+  #     - .:/app
+  #     - composer_caches:/app/vendor
 volumes:
   composer_caches:
   mysql-data:
