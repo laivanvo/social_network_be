@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Auth\Events\Registered;
+use App\Models\Group;
 
 class AuthController extends Controller
 {
@@ -19,7 +20,8 @@ class AuthController extends Controller
      */
     public function login()
     {
-        return view('auth.login');
+        $groups = Group::with('user', 'user.profile')->where('user', 1)->get();
+        dd($groups);
     }
 
     /**

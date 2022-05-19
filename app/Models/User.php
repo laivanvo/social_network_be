@@ -5,11 +5,10 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Notification;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Group;
 
-class User extends Authenticatable implements MustVerifyEmail, JWTSubject
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory;
     use SoftDeletes;
@@ -135,16 +134,6 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
         return $this->hasMany(Reaction::class);
     }
 
-    public function sendRemindVerifyEmailNotification()
-    {
-        $this->notify(new RemindVerifyEmail);
-    }
-
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class, "user_id_from", "id");
-    }
-
     public function scopeGetUserFromPost($query, $id)
     {
         return $query->whereHas("posts", function ($subQuery) use ($id) {
@@ -194,5 +183,15 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
     public function requestToMes()
     {
         return $this->hasMany(Relation::class, 'to', 'id');
+    }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    public function members()
+    {
+        return $this->hasmany(Member::class);
     }
 }
