@@ -45,6 +45,12 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/relations/birth', [RelationshipController::class, 'listFriendByBirthday'])->name('relationship.listFriendByBirthday');
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/groups', [GroupController::class, 'index'])->name('group.index');
+
+    Route::get('/groups', [GroupController::class, 'list'])->name('group.list');
+    Route::get('/groups/show/{id}', [GroupController::class, 'show'])->name('group.show');
+    Route::get('/groups/me', [GroupController::class, 'listOfMe'])->name('group.listOfMe');
+    Route::get('/groups/send', [GroupController::class, 'listSend'])->name('group.Send');
     Route::post('/groups', [GroupController::class, 'store'])->name('group.store');
+    Route::get('/groups/join/{id}', [GroupController::class, 'joinGroup'])->name('group.join');
+    Route::get('/groups/member/{id}', [GroupController::class, 'listMember'])->name('group.member');
 });

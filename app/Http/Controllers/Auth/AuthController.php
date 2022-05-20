@@ -20,8 +20,8 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $groups = Group::with('user', 'user.profile')->where('user', 1)->get();
-        dd($groups);
+        $myGroup = User::find(13)->groups()->get()->pluck('id')->toArray();
+        dd($myGroup);
     }
 
     /**

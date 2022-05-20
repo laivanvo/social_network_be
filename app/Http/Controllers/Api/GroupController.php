@@ -16,12 +16,60 @@ class GroupController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function list()
     {
-        $groups = Group::with('user', 'user.profile')->where('user->id', '>', -1)->get();
+        $myGroup = $this->currentUser()->groups()->get()->pluck('id')->toArray();
+        if (!count($myGroup)) {
+            $myGroup = [];
+        }
+        $member = $this->currentUser()->members()->get()->pluck('group_id')->toArray();
+        if (!count($member)) {
+            $member = [];
+        }
+        for ($i = 0; $i < count($member); $i++) {
+            array_push($myGroup, $member[$i]);
+        }
+        $groups = Group::with('user', 'user.profile')->whereNotIn('id', $myGroup)->get();
         return response()->json([
             'success' => true,
             'groups' => $groups,
+        ], 200);
+    }
+
+    public function listOfMe()
+    {
+        $myGroups = $this->currentUser()->groups()->with('user', 'user.profile')->get();
+        return response()->json([
+            'success' => true,
+            'groups' => $myGroups,
+        ], 200);
+    }
+
+    public function listSend()
+    {
+        $mySends = Member::where('user_id', $this->currentUser()->id)->where('type', 'request')->get()->pluck('group_id');
+        $groups = Group::with('user', 'user.profile')->whereIn('id', $mySends)->get();
+        return response()->json([
+            'success' => true,
+            'groups' => $groups,
+        ], 200);
+    }
+
+    public function listRequest($id)
+    {
+        $groups = Group::findOrFail($id)->members()->where('type', 'request');
+        return response()->json([
+            'success' => true,
+            'groups' => $groups,
+        ], 200);
+    }
+
+    public function show($id)
+    {
+        $group = Group::findOrFail($id)->with(['members', 'user', 'user.profile', 'members.user', 'members.user.profile'])->first();
+        return response()->json([
+            'success' => true,
+            'group' => $group,
         ], 200);
     }
 
@@ -38,7 +86,7 @@ class GroupController extends ApiController
             'audience' => $request->audience,
             'avatar' => $avatar,
         ]);
-        $group = Group::findOrFail($group->id)->with('user', 'user.profile');
+        $group = Group::with(['user', 'user.profile'])->findOrFail($group->id);
         return response()->json([
             'success' => true,
             'groups' => $group,
@@ -52,5 +100,20 @@ class GroupController extends ApiController
             'user_id' => $this->currentUser()->id,
             'type' => 'request',
         ]);
+        $group = Group::with('user', 'user.profile')->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'group' => $group,
+        ], 200);
+    }
+
+    public function listMember($id)
+    {
+        $member = Group::findOrFail($id)->members()->get()->pluck('user_id')->toArray();
+        $profiles = Profile::whereIn('user_id', $member)->get();
+        return response()->json([
+            'success' => true,
+            'profiles' => $profiles,
+        ], 200);
     }
 }
