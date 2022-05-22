@@ -7,37 +7,74 @@ use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
 use App\Models\BgImage;
-
+use App\Models\Group;
 
 class PostController extends ApiController
 {
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function getProfile() {
+        return response()->json([
+            'success' => true,
+            'profile' => $this->currentUser()->profile,
+        ], 200);
+    }
     public function index()
     {
         $posts = Post::with([
-            'user',
+            'user', 'user.profile',
         ])
+            ->where('group_id', -1)
             ->orderby('id', 'desc')
-            ->paginate(2);
+            ->paginate(5);
         return response()->json([
             'success' => true,
             'posts' => $posts,
-            'user' => $this->currentUser()
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
+        ], 200);
+    }
+
+    public function listPostGroup()
+    {
+        $myGroups = $this->currentUser()->groups()->get()->pluck('id')->toArray();
+        $posts = Post::with([
+            'user', 'user.profile',
+        ])
+            ->whereIn('group_id', $myGroups)
+            ->orderby('id', 'desc')
+            ->take(5);
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
         ], 200);
     }
 
     public function indexPersonal()
     {
         $posts = $this->currentUser()->posts()->with([
-            'user',
+            'user', 'user.profile',
         ])
+            ->where('group_id', -1)
             ->orderby('id', 'desc')
             ->paginate(2);
+        $profile = $this->currentUser()->profile;
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $profile,
+        ], 200);
+    }
+
+    public function indexGroup($id)
+    {
+        $posts = $this->currentUser()->posts()->with([
+            'user', 'user.profile',
+        ])
+            ->where('group_id', $id)
+            ->orderby('id', 'desc')
+            ->paginate(5);
         $profile = $this->currentUser()->profile;
         return response()->json([
             'success' => true,
@@ -88,8 +125,9 @@ class PostController extends ApiController
         $post->text = $request->text;
         $post->bg_image = $request->bg;
         $post->count_comment = 0;
+        $post->group_id = $request->group_id;
         $post->save();
-        $post = Post::with(['user'])->findOrFail($post->id);
+        $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
         return response()->json([
             'success' => 'create post successfully.',
             'post' => $post,
@@ -117,6 +155,7 @@ class PostController extends ApiController
         $post->text = $request->text;
         $post->bg_image = $request->bg;
         $post->save();
+        $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
         return response()->json([
             'post' => $post,
             'success' => 'create post successfully.'
@@ -133,35 +172,6 @@ class PostController extends ApiController
             'videos' => $videos,
         ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
     /**
      * Remove the specified resource from storage.
      *

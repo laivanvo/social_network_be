@@ -12,12 +12,6 @@ use App\Models\Relation;
 
 class RelationshipController extends ApiController
 {
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index($id)
     {
         $relation = $this->currentUser()->requestToMes();
@@ -46,25 +40,30 @@ class RelationshipController extends ApiController
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function listRequest()
     {
-        $from = $this->currentUser()->requestToMes()->where('type', 'request')->pluck('from');
-        $relations = Profile::whereIn('user_id', $from)->get();
+        $from = $this->currentUser()->requestToMes()->where('type', 'request')->pluck('from')->toArray();
+        $profiles = Profile::whereIn('user_id', $from)->get();
         return response()->json([
-            'relations' => $relations,
+            'profiles' => $profiles,
             'success' => 'send request successfully.'
         ]);
     }
 
+    public function listSend()
+    {
+        $from = $this->currentUser()->requestByMes()->where('type', 'request')->pluck('to')->toArray();
+        $profiles = Profile::whereIn('user_id', $from)->get();
+        return response()->json([
+            'profiles' => $profiles,
+            'success' => 'send request successfully.'
+        ]);
+    }
     public function listFriend()
     {
-        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from');
-        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to');
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from')->toArray();
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to')->toArray();
         if (!count($from)) {
             $from = [];
         }
@@ -76,7 +75,7 @@ class RelationshipController extends ApiController
         }
         $relations = Profile::whereIn('user_id', $from)->get();
         return response()->json([
-            'relations' => $relations,
+            'profiles' => $relations,
             'success' => 'send request successfully.'
         ]);
     }

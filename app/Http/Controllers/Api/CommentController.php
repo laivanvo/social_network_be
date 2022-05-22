@@ -113,13 +113,13 @@ class CommentController extends ApiController
      */
     public function destroy($id, Request $request)
     {
-        if ($request->type = 'post') {
+        if ($request->type == 'post') {
             $post = Post::findOrFail($request->id);
             $post->count_comment--;
             $post->save();
         } else {
             $commentz = Comment::findOrFail($request->id);
-            $commentz->count_comment--;
+            $commentz->count_rep--;
             $commentz->save();
         }
         $this->currentUser()->comments()->findOrFail($id)->delete();

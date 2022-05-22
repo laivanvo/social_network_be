@@ -45,6 +45,15 @@ class GroupController extends ApiController
         ], 200);
     }
 
+    public function listOfMeCurrent()
+    {
+        $myGroups = $this->currentUser()->groups()->with('user', 'user.profile')->take(10)->get();
+        return response()->json([
+            'success' => true,
+            'groups' => $myGroups,
+        ], 200);
+    }
+
     public function listSend()
     {
         $mySends = Member::where('user_id', $this->currentUser()->id)->where('type', 'request')->get()->pluck('group_id');
@@ -89,7 +98,7 @@ class GroupController extends ApiController
         $group = Group::with(['user', 'user.profile'])->findOrFail($group->id);
         return response()->json([
             'success' => true,
-            'groups' => $group,
+            'group' => $group,
         ], 200);
     }
 
