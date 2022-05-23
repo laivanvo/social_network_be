@@ -51,6 +51,26 @@ class RelationshipController extends ApiController
         ]);
     }
 
+    public function listSuggest()
+    {
+        $from = $this->currentUser()->requestToMes()->pluck('from')->toArray();
+        $to = $this->currentUser()->requestByMes()->pluck('to')->toArray();
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        $profiles = Profile::whereNotIn('user_id', $from)->get();
+        return response()->json([
+            'profiles' => $profiles,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
     public function listSend()
     {
         $from = $this->currentUser()->requestByMes()->where('type', 'request')->pluck('to')->toArray();

@@ -47,13 +47,14 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
     Route::post('/relations/send/{id}', [RelationshipController::class, 'sendRequest'])->name('relationship.send');
     Route::post('/relations/res/{id}', [RelationshipController::class, 'response'])->name('relationship.response');
-    Route::get('/relations', [RelationshipController::class, 'listRequest'])->name('relationship.list');
     Route::get('/relations/address', [RelationshipController::class, 'listFriendByAddress'])->name('relationship.listFriendByAddress');
     Route::get('/relations/friend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
     Route::get('/relations/birth', [RelationshipController::class, 'listFriendByBirthday'])->name('relationship.listFriendByBirthday');
     Route::get('/relation/listFriend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
     Route::get('/relation/listSend', [RelationshipController::class, 'listSend'])->name('relationship.listSend');
-    Route::get('/relation/listRequest', [RelationshipController::class, 'listRequest'])->name('relationship.listRequest');
+    Route::get('/relations/listRequest', [RelationshipController::class, 'listRequest'])->name('relationship.listRequest');
+    Route::get('/relations/listSuggest', [RelationshipController::class, 'listSuggest'])->name('relationship.listSuggest');
+
 
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
