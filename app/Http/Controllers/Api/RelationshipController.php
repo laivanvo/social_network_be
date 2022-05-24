@@ -44,11 +44,19 @@ class RelationshipController extends ApiController
     public function listRequest()
     {
         $from = $this->currentUser()->requestToMes()->where('type', 'request')->pluck('from')->toArray();
-        $profiles = Profile::whereIn('user_id', $from)->get();
-        return response()->json([
-            'profiles' => $profiles,
-            'success' => 'send request successfully.'
-        ]);
+        if ($from) {
+            $profiles = Profile::whereIn('user_id', $from)->get();
+            return response()->json([
+                'profiles' => $profiles,
+                'success' => 'send request successfully.'
+            ]);
+
+        } else {
+            return response()->json([
+                'profiles' => null,
+                'success' => 'send request successfully.'
+            ]);
+        }
     }
 
     public function listSuggest()
@@ -140,152 +148,56 @@ class RelationshipController extends ApiController
         ]);
     }
 
-    public function sendRequest($id, Request $request)
+    public function sendRequest($id)
     {
-        $type = '';
-        if ($request->type == 'add') {
-            Relation::create([
-                'from' => $this->currentUser()->id,
-                'to' => $id,
-                'type' => 'request',
-            ]);
-            $type = 'request';
-        } else {
-            $relation = Relation::Where('to', $id);
-            $relation->delete();
-            $type = 'none';
-        }
+        Relation::create([
+            'from' => $this->currentUser()->id,
+            'to' => $id,
+            'type' => 'request',
+        ]);
         return response()->json([
-            'type' => $type,
             'success' => 'send request successfully.'
         ]);
     }
 
-    public function response($id, Request $request)
+    public function check($id)
     {
-        $type = '';
-        if ($request->type == 'accept') {
-            $relation = Relation::where('from', $id)->where('to', $this->currentUser()->id)->first();
-            $relation->type = 'friend';
-            $relation->save();
-        } else {
-            $relation = Relation::where('from', $id)->where('to', $this->currentUser()->id)->first();
-            $relation->delete();
+        $from = Relation::where('to', $id)->where('from', $this->currentUser()->id)->first();
+        if ($from) {
+            return response()->json([
+                'success' => 'send request successfully.',
+                'type' => $from->type . 'ByMe',
+                'relation' => $from,
+            ]);
+        }
+        $to = Relation::where('from', $id)->where('to', $this->currentUser()->id)->first();
+        if ($to) {
+            return response()->json([
+                'success' => 'send request successfully.',
+                'type' => $to->type . "ToMe",
+                'relation' => $to,
+            ]);
         }
         return response()->json([
-            'success' => 'response successfully.'
+            'success' => 'send request successfully.',
+            'type' => 'none',
+            'relation' => null,
         ]);
     }
 
-    public function update($id, Request $request)
-    {
-
-        // $request->validate([
-        //     'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
-        // ]);
-
-        $post = Post::find($id);
-        $post->user_id = $this->currentUser()->id;
-        if ($request->file()) {
-            $file_name = time() . '_' . $request->file->getClientOriginalName();
-            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
-            $post->file = '/storage/' . $file_path;
-            $post->type = substr($request->file->getClientMimeType(), 0, 5);
-        } else {
-            $post->type = 'text';
-        }
-        $post->audience = $request->audience;
-        $post->text = $request->text;
-        $post->bg_image = $request->bg;
-        $post->save();
+    public function destroy($id) {
+        Relation::findOrFail($id)->delete();
         return response()->json([
-            'post' => $post,
-            'success' => 'create post successfully.'
+            'success' => 'send request successfully.',
         ]);
     }
 
-
-    public function getFile()
-    {
-        $images = FileUpload::where('type', 'image')->get();
-        $videos = FileUpload::where('type', 'video')->get();
+    public function accept($id) {
+        $relation = Relation::findOrfail($id);
+        $relation->type = "friend";
+        $relation->save();
         return response()->json([
-            'images' => $images,
-            'videos' => $videos,
+            'success' => 'send request successfully.',
         ]);
-    }
-
-
-    public function indexPersonal()
-    {
-        $user = $this->currentUser();
-        $posts = $user->posts()->with(['user'])->get();
-        return response()->json([
-            'success' => true,
-            'posts' => $posts,
-            'user' => $this->currentUser()
-        ], 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $this->currentUser()->posts()->findOrFail($id)->delete();
-        return response()->json(['success' => 'create post successfully.']);
-    }
-
-    /**
-     * Display a listing of friends's posts
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getFriendPosts()
-    {
-        $friendIds = $this->currentUser()->friends()->pluck(['id']);
-        $friendPosts = Post::whereIn('user_id', $friendIds)
-            ->isPublic()
-            ->newestPosts()
-            ->with(['profile', 'reactions'])
-            ->paginate($this->paginationNum);
-        if ($friendPosts->count() > 0) {
-            foreach ($friendPosts as $row) {
-                $row->audience = Post::getAudienceValue($row->audience);
-            }
-            return view('app.post.posts', ['posts' => $friendPosts]);
-        }
-        return response()->json(['message' => 'Max'], 200);
     }
 }

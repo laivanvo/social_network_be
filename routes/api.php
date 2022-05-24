@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\RelationshipController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\MemberController;
+use App\Http\Controllers\Api\UserController;
 
 
 /*
@@ -39,16 +40,20 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts', [PostController::class, 'index'])->name('post.index');
     Route::get('/posts/group', [PostController::class, 'listPostGroup'])->name('post.groups');
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
+    Route::get('/posts/byPerson/{id}', [PostController::class, 'indexByPerson'])->name('reactions.indexByPerson');
     Route::get('/posts/group/{id}', [PostController::class, 'indexGroup'])->name('reactions.indexGroup');
     Route::post('/posts', [PostController::class, 'store'])->name('post.store');
     Route::post('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
 
     Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
-    Route::post('/relations/send/{id}', [RelationshipController::class, 'sendRequest'])->name('relationship.send');
+    Route::get('/relations/check/{id}', [RelationshipController::class, 'check'])->name('relationship.check');
+    Route::get('/relations/destroy/{id}', [RelationshipController::class, 'destroy'])->name('relationship.destroy');
+    Route::get('/relations/accept/{id}', [RelationshipController::class, 'accept'])->name('relationship.accept');
+    Route::get('/relations/send/{id}', [RelationshipController::class, 'sendRequest'])->name('relationship.send');
     Route::post('/relations/res/{id}', [RelationshipController::class, 'response'])->name('relationship.response');
     Route::get('/relations/address', [RelationshipController::class, 'listFriendByAddress'])->name('relationship.listFriendByAddress');
-    Route::get('/relations/friend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
+    // Route::get('/relations/friend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
     Route::get('/relations/birth', [RelationshipController::class, 'listFriendByBirthday'])->name('relationship.listFriendByBirthday');
     Route::get('/relation/listFriend', [RelationshipController::class, 'listFriend'])->name('relationship.listFriend');
     Route::get('/relation/listSend', [RelationshipController::class, 'listSend'])->name('relationship.listSend');
@@ -71,4 +76,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('members/{id}/accept', [MemberController::class, 'listAccept'])->name('member.listAccept');
     Route::get('members/{id}/request', [MemberController::class, 'listRequest'])->name('member.listRequest');
     Route::post('members/destroy', [MemberController::class, 'destroy'])->name('member.destroy');
+
+    Route::get('users/getImages/{id}', [UserController::class, 'getImages'])->name('member.getImages');
+    Route::get('users/getVideos/{id}', [UserController::class, 'getVideos'])->name('member.getVideos');
 });

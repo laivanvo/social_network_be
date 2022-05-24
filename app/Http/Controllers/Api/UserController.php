@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
 use App\Models\Relation;
+use App\Models\User;
 
 class UserController extends ApiController
 {
@@ -21,6 +22,22 @@ class UserController extends ApiController
         $relation = Relation::all();
         return response()->json([
             'relation' => $relation,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
+    public function getImages($id) {
+        $images = User::findOrFail($id)->posts()->where('type', 'image')->pluck('file')->toArray();
+        return response()->json([
+            'images' => $images,
+            'success' => 'send request successfully.'
+        ]);
+    }
+
+    public function getVideos($id) {
+        $videos = User::findOrFail($id)->posts()->where('type', 'video')->pluck('file')->toArray();
+        return response()->json([
+            'videos' => $videos,
             'success' => 'send request successfully.'
         ]);
     }
@@ -87,41 +104,6 @@ class UserController extends ApiController
             'user' => $this->currentUser()
         ], 200);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $this->currentUser()->posts()->findOrFail($id)->delete();

@@ -7,7 +7,7 @@ use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
 use App\Models\BgImage;
-use App\Models\Group;
+use App\Models\User;
 
 class PostController extends ApiController
 {
@@ -58,6 +58,23 @@ class PostController extends ApiController
             ->where('group_id', -1)
             ->orderby('id', 'desc')
             ->paginate(2);
+        $profile = $this->currentUser()->profile;
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $profile,
+        ], 200);
+    }
+
+    public function indexByPerson($id)
+    {
+        $posts = User::findOrFail($id)->posts()->with([
+            'user', 'user.profile',
+        ])
+            ->where('group_id', -1)
+            ->orderby('id', 'desc')
+            ->get();
         $profile = $this->currentUser()->profile;
         return response()->json([
             'success' => true,
