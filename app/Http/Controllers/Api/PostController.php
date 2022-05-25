@@ -142,6 +142,7 @@ class PostController extends ApiController
         $post->text = $request->text;
         $post->bg_image = $request->bg;
         $post->count_comment = 0;
+        $post->count_reaction = 0;
         $post->group_id = $request->group_id;
         $post->save();
         $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);

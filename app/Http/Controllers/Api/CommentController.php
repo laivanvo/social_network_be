@@ -24,15 +24,15 @@ class CommentController extends ApiController
     {
         if ($request->type == 'post') {
             $comments = Comment::with(['user'])
-            ->where('post_id', $request->id)
-            ->orderBy('id', 'desc')
-            ->paginate(2);
+                ->where('post_id', $request->id)
+                ->orderBy('id', 'desc')
+                ->paginate(2);
             $count = Comment::where('post_id', $request->id);
         } else {
             $comments = Comment::with(['user'])
-            ->where('previous_id', $request->id)
-            ->orderBy('id', 'desc')
-            ->paginate(2);
+                ->where('previous_id', $request->id)
+                ->orderBy('id', 'desc')
+                ->paginate(2);
             $count = Comment::where('previous_id', $request->id);
         }
         return response()->json([
@@ -50,24 +50,44 @@ class CommentController extends ApiController
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {;
         if ($request->type == 'post') {
-            $this->currentUser()->comments()->create([
-                'post_id' => $request->id,
-                'previous_id' => -1,
-                'text' => $request->text,
-                'count_rep' => 0,
-            ]);
+            $comment = new Comment();
+            $comment->user_id = $this->currentUser()->id;
+            if ($request->file()) {
+                $file_name = time() . '_' . $request->file->getClientOriginalName();
+                $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+                $comment->file = '/storage/' . $file_path;
+                $comment->type = substr($request->file->getClientMimeType(), 0, 5);
+            } else {
+                $comment->type = 'text';
+            }
+            $comment->post_id = $request->id;
+            $comment->previous_id = -1;
+            $comment->text = $request->text;
+            $comment->count_rep = 0;
+            $comment->count_reaction = 0;
+            $comment->save();
             $post = Post::findOrFail($request->id);
             $post->count_comment++;
             $post->save();
         } else {
-            $this->currentUser()->comments()->create([
-                'post_id' => -1,
-                'previous_id' => $request->id,
-                'text' => $request->text,
-                'count_rep' => 0,
-            ]);
+            $comment = new Comment();
+            $comment->user_id = $this->currentUser()->id;
+            if ($request->file()) {
+                $file_name = time() . '_' . $request->file->getClientOriginalName();
+                $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+                $comment->file = '/storage/' . $file_path;
+                $comment->type = substr($request->file->getClientMimeType(), 0, 5);
+            } else {
+                $comment->type = 'text';
+            }
+            $comment->post_id = $request->id;
+            $comment->previous_id = -1;
+            $comment->text = $request->text;
+            $comment->count_rep = 0;
+            $comment->count_reaction = 0;
+            $comment->save();
             $commentz = Comment::findOrFail($request->id);
             $commentz->count_rep++;
             $commentz->save();

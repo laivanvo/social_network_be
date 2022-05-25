@@ -30,6 +30,7 @@ class Post extends Model
         'file',
         'type',
         'count_comment',
+        'count_reaction'
     ];
 
     public static function getAudiences()
