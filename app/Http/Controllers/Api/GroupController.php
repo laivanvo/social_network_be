@@ -6,6 +6,8 @@ use App\Http\Controllers\ApiController;
 use App\Models\Group;
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Faker\Factory;
+
 
 
 class GroupController extends ApiController
@@ -44,6 +46,25 @@ class GroupController extends ApiController
             'groups' => $myGroups,
         ], 200);
     }
+
+    public function listJoin()
+    {
+        $myGroups = $this->currentUser()->members()->where('user_id', $this->currentUser()->id)->where('type', 'member')->get()->pluck('group_id')->toArray();
+        $groups = Group::whereIn('id', $myGroups);
+        return response()->json([
+            'success' => true,
+            'groups' => $groups,
+        ], 200);
+    }
+
+    // public function listOfMe()
+    // {
+    //     $myGroups = $this->currentUser()->groups()->with('user', 'user.profile')->get();
+    //     return response()->json([
+    //         'success' => true,
+    //         'groups' => $myGroups,
+    //     ], 200);
+    // }
 
     public function listOfMeCurrent()
     {
@@ -84,6 +105,7 @@ class GroupController extends ApiController
 
     public function store(Request $request)
     {
+        $faker = Factory::create();
         $avatar = "";
         if ($request->file()) {
             $file_name = time() . '_' . $request->file->getClientOriginalName();
@@ -91,8 +113,11 @@ class GroupController extends ApiController
             $avatar = '/storage/' . $file_path;
         }
         $group = $this->currentUser()->groups()->create([
+            'card' => $faker->phonenumber,
             'name' => $request->name,
             'audience' => $request->audience,
+            'content' => $request->content,
+            'bonus' => $request->bonus,
             'avatar' => $avatar,
         ]);
         $group = Group::with(['user', 'user.profile'])->findOrFail($group->id);

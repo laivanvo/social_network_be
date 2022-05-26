@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
 use App\Models\BgImage;
+use App\Models\Group;
 use App\Models\User;
 
 class PostController extends ApiController
@@ -35,11 +36,28 @@ class PostController extends ApiController
 
     public function listPostGroup()
     {
-        $myGroups = $this->currentUser()->groups()->get()->pluck('id')->toArray();
+        $myGroups = $this->currentUser()->members()->where('user_id', $this->currentUser()->id)->where('type', 'member')->get()->pluck('group_id')->toArray();
         $posts = Post::with([
             'user', 'user.profile',
         ])
             ->whereIn('group_id', $myGroups)
+            ->orderby('id', 'desc')
+            ->take(5);
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
+        ], 200);
+    }
+
+    public function listPostByGroup($id)
+    {
+        $group = Group::findOrFail($id);
+        $posts = Post::with([
+            'user', 'user.profile',
+        ])
+            ->where('group_id', $group)
             ->orderby('id', 'desc')
             ->take(5);
         return response()->json([

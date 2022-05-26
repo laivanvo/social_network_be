@@ -11,6 +11,9 @@ class Group extends Model
         'name',
         'audience',
         'avatar',
+        'card',
+        'content',
+        'bonus',
     ];
 
     public function user()

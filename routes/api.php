@@ -39,6 +39,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts/profile', [PostController::class, 'getProfile'])->name('post.profile');
     Route::get('/posts', [PostController::class, 'index'])->name('post.index');
     Route::get('/posts/group', [PostController::class, 'listPostGroup'])->name('post.groups');
+    Route::get('/posts/group/{id}', [PostController::class, 'listPostByGroup'])->name('post.listPostByGroup');
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
     Route::get('/posts/byPerson/{id}', [PostController::class, 'indexByPerson'])->name('reactions.indexByPerson');
     Route::get('/posts/group/{id}', [PostController::class, 'indexGroup'])->name('reactions.indexGroup');
@@ -72,6 +73,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('/groups', [GroupController::class, 'store'])->name('group.store');
     Route::get('/groups/join/{id}', [GroupController::class, 'joinGroup'])->name('group.join');
     Route::get('/groups/member/{id}', [GroupController::class, 'listMember'])->name('group.member');
+    Route::get('/groups/join', [GroupController::class, 'listJoin'])->name('join');
 
     Route::get('members/{id}/accept', [MemberController::class, 'listAccept'])->name('member.listAccept');
     Route::get('members/{id}/request', [MemberController::class, 'listRequest'])->name('member.listRequest');
