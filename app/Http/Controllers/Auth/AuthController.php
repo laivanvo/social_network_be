@@ -20,8 +20,8 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $from = User::find(13)->requestToMes()->where('type', 'request')->pluck('from')->toArray();
-        dd($from);
+        $member = Group::findOrFail(39)->members()->where('type', 'request')->get()->pluck('user_id')->toArray();
+        dd($member);
     }
 
     /**

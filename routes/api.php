@@ -75,9 +75,11 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/groups/member/{id}', [GroupController::class, 'listMember'])->name('group.member');
     Route::get('/groups/join', [GroupController::class, 'listJoin'])->name('join');
 
-    Route::get('members/{id}/accept', [MemberController::class, 'listAccept'])->name('member.listAccept');
-    Route::get('members/{id}/request', [MemberController::class, 'listRequest'])->name('member.listRequest');
+    Route::get('members/index/{id}', [MemberController::class, 'listMember'])->name('member.listMember');
+    Route::get('members/request/{id}', [MemberController::class, 'listRequest'])->name('member.listRequest');
     Route::post('members/destroy', [MemberController::class, 'destroy'])->name('member.destroy');
+    Route::post('members/accept', [MemberController::class, 'accept'])->name('member.accept');
+
 
     Route::get('users/getImages/{id}', [UserController::class, 'getImages'])->name('member.getImages');
     Route::get('users/getVideos/{id}', [UserController::class, 'getVideos'])->name('member.getVideos');

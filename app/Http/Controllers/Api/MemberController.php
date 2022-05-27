@@ -11,9 +11,9 @@ use App\Models\Profile;
 
 class MemberController extends ApiController
 {
-    public function listAccept($id)
+    public function listMember($id)
     {
-        $member = Group::findOrFail($id)->members()->where('type', 'accept')->get()->pluck('user_id')->toArray();
+        $member = Group::findOrFail($id)->members()->where('type', 'member')->get()->pluck('user_id')->toArray();
         $profiles = Profile::whereIn('user_id', $member)->get();
         return response()->json([
             'success' => true,
@@ -31,9 +31,19 @@ class MemberController extends ApiController
         ], 200);
     }
 
+    public function accept(Request $request) {
+        $member = Member::where('group_id', $request->group_id)->where('user_id', $request->user_id)->first();
+        $member->type = 'member';
+        $member->Save();
+        return response()->json([
+            'success' => true,
+        ], 200);
+    }
+
     public function destroy(Request $request)
     {
-        Member::where('group_id', $request->group_id)->where('user_id', $request->user_id)->delete();
+        $member = Member::where('group_id', $request->group_id)->where('user_id', $request->user_id)->first();
+        $member->delete();
         return response()->json([
             'success' => true,
         ], 200);

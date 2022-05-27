@@ -20,18 +20,7 @@ class GroupController extends ApiController
      */
     public function list()
     {
-        $myGroup = $this->currentUser()->groups()->get()->pluck('id')->toArray();
-        if (!count($myGroup)) {
-            $myGroup = [];
-        }
-        $member = $this->currentUser()->members()->get()->pluck('group_id')->toArray();
-        if (!count($member)) {
-            $member = [];
-        }
-        for ($i = 0; $i < count($member); $i++) {
-            array_push($myGroup, $member[$i]);
-        }
-        $groups = Group::with('user', 'user.profile')->whereNotIn('id', $myGroup)->get();
+        $groups = Group::with('user', 'user.profile', 'members')->where('avatar', '<>', "")->get();
         return response()->json([
             'success' => true,
             'groups' => $groups,
