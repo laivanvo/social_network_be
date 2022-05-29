@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiController;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 
 class ProfileController extends ApiController
@@ -13,6 +14,15 @@ class ProfileController extends ApiController
         return response()->json([
             'success' => true,
             'profile' => $profile,
+        ], 200);
+    }
+
+    public function list()
+    {
+        $profiles = Profile::where('user_id' , '<>', $this->currentUser()->id)->get();
+        return response()->json([
+            'success' => true,
+            'profiles' => $profiles,
         ], 200);
     }
 

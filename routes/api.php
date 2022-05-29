@@ -63,6 +63,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
 
 
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profiles/list', [ProfileController::class, 'list'])->name('profile.list');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/groups', [GroupController::class, 'list'])->name('group.list');
