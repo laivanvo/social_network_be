@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Block;
 
 class Post extends Model
 {
@@ -30,7 +31,9 @@ class Post extends Model
         'file',
         'type',
         'count_comment',
-        'count_reaction'
+        'count_reaction',
+        'off_comment',
+        'in_queue',
     ];
 
     public static function getAudiences()
@@ -110,5 +113,10 @@ class Post extends Model
     public function profile()
     {
         return $this->belongsTo(Profile::class, 'user_id', 'user_id');
+    }
+
+    public function blocks()
+    {
+        return $this->hasMany(Block::class);
     }
 }

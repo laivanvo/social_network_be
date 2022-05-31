@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\BgImage;
 use App\Models\Group;
 use App\Models\User;
+use App\Models\Relation;
 
 class PostController extends ApiController
 {
@@ -20,11 +21,25 @@ class PostController extends ApiController
     }
     public function index()
     {
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from')->toArray();
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to')->toArray();
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        array_push($from, $this->currentUser()->id);
         $posts = Post::with([
-            'user', 'user.profile',
+            'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
+            ->whereIn('user_id', $from)
             ->orderby('id', 'desc')
+            ->where('audience', 'public')
             ->paginate(5);
         return response()->json([
             'success' => true,
@@ -55,11 +70,11 @@ class PostController extends ApiController
     {
         $group = Group::findOrFail($id);
         $posts = Post::with([
-            'user', 'user.profile',
+            'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', $group)
             ->orderby('id', 'desc')
-            ->take(5);
+            ->paginate(5);
         return response()->json([
             'success' => true,
             'posts' => $posts,
@@ -162,6 +177,8 @@ class PostController extends ApiController
         $post->count_comment = 0;
         $post->count_reaction = 0;
         $post->group_id = $request->group_id;
+        $post->off_comment = false;
+        $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
         $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
         return response()->json([

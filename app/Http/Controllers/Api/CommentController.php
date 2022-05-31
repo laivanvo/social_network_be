@@ -23,7 +23,7 @@ class CommentController extends ApiController
     public function index(Request $request)
     {
         if ($request->type == 'post') {
-            $comments = Comment::with(['user'])
+            $comments = Comment::with(['user', 'user.profile'])
                 ->where('post_id', $request->id)
                 ->orderBy('id', 'desc')
                 ->paginate(2);

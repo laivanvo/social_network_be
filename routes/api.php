@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\RelationshipController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\BlockController;
+
 
 
 /*
@@ -84,4 +86,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
 
     Route::get('users/getImages/{id}', [UserController::class, 'getImages'])->name('member.getImages');
     Route::get('users/getVideos/{id}', [UserController::class, 'getVideos'])->name('member.getVideos');
+
+    Route::post('/blocks', [BlockController::class, 'store'])->name('blocks.store');
+    Route::post('/blocks/destroy', [BlockController::class, 'destroy'])->name('blocks.destroy');
 });
