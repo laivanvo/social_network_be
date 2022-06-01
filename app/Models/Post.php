@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Block;
+use App\Models\File;
 
 class Post extends Model
 {
@@ -118,5 +119,10 @@ class Post extends Model
     public function blocks()
     {
         return $this->hasMany(Block::class);
+    }
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
     }
 }

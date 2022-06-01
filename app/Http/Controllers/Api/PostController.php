@@ -7,13 +7,15 @@ use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
 use App\Models\BgImage;
+use App\Models\File;
 use App\Models\Group;
 use App\Models\User;
 use App\Models\Relation;
 
 class PostController extends ApiController
 {
-    public function getProfile() {
+    public function getProfile()
+    {
         return response()->json([
             'success' => true,
             'profile' => $this->currentUser()->profile,
@@ -34,7 +36,7 @@ class PostController extends ApiController
         }
         array_push($from, $this->currentUser()->id);
         $posts = Post::with([
-            'user', 'user.profile', 'blocks'
+            'files', 'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
             ->whereIn('user_id', $from)
@@ -162,15 +164,8 @@ class PostController extends ApiController
         // ]);
 
         $post = new Post();
+        $post->file = '';
         $post->user_id = $this->currentUser()->id;
-        if ($request->file()) {
-            $file_name = time() . '_' . $request->file->getClientOriginalName();
-            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
-            $post->file = '/storage/' . $file_path;
-            $post->type = substr($request->file->getClientMimeType(), 0, 5);
-        } else {
-            $post->type = 'text';
-        }
         $post->audience = $request->audience;
         $post->text = $request->text;
         $post->bg_image = $request->bg;
@@ -181,6 +176,22 @@ class PostController extends ApiController
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
         $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
+        for ($i = 0; $i < $request->count - 1; $i++) {
+            $file = 'file' . $i;
+            $file_name = time() . '_' . $request->$file->getClientOriginalName();
+            $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
+            $post->files()->create([
+                'path' => '/storage/' . $file_path,
+                'type' => substr($request->$file->getClientMimeType(), 0, 5),
+            ]);
+        }
+
+        $file_name = time() . '_' . $request->$file->getClientOriginalName();
+        $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
+        $post->files()->create([
+            'path' => '/storage/' . $file_path,
+            'type' => substr($request->$file->getClientMimeType(), 0, 5),
+        ]);
         return response()->json([
             'success' => 'create post successfully.',
             'post' => $post,
