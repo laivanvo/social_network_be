@@ -156,6 +156,13 @@ class PostController extends ApiController
         }
     }
 
+    public function offComment($id) {
+        $post = Post::findOrFail($id);
+        $post->off_comment = $post->off_comment == 0 ? 1 : 0;
+        $post->save();
+        return response()->json(['success' => 'File uploaded successfully.']);
+    }
+
     public function store(Request $request)
     {
 
@@ -175,7 +182,6 @@ class PostController extends ApiController
         $post->off_comment = false;
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
-        $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
         for ($i = 0; $i < $request->count - 1; $i++) {
             $file = 'file' . $i;
             $file_name = time() . '_' . $request->$file->getClientOriginalName();
@@ -185,13 +191,14 @@ class PostController extends ApiController
                 'type' => substr($request->$file->getClientMimeType(), 0, 5),
             ]);
         }
-
+        $file = 'file' . ($request->count - 1);
         $file_name = time() . '_' . $request->$file->getClientOriginalName();
         $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
         $post->files()->create([
             'path' => '/storage/' . $file_path,
             'type' => substr($request->$file->getClientMimeType(), 0, 5),
         ]);
+        $post = Post::with(['files', 'user', 'user.profile', 'blocks'])->findOrFail($post->id);
         return response()->json([
             'success' => 'create post successfully.',
             'post' => $post,

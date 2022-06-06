@@ -15,9 +15,9 @@ class CreateFilesTable extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->integer('comments_id');
-            $table->integer('posts_id');
-            $table->char('type', 50);
+            $table->bigInteger('post_id');
+            $table->string('path');
+            $table->string('type');
             $table->timestamps();
         });
     }

@@ -48,6 +48,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('post.store');
     Route::post('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
+    Route::get('/post/off_comment/{id}', [CommentController::class, 'offComment'])->name('Comment.offComment');
 
     Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
     Route::get('/relations/check/{id}', [RelationshipController::class, 'check'])->name('relationship.check');
