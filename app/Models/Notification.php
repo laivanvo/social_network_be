@@ -2,24 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
 
 class Notification extends Model
 {
-    use HasFactory;
-
-    protected $table = "notices";
-
-    protected $fillable = ['users_id_to', 'user_id_from', 'data', 'action', 'notifiable_id', 'notifiable_type', 'read_at'];
+    protected $fillable = ['from', 'to', 'post_id', 'comment_id', 'content'];
 
     public function notifiable()
     {
         return $this->morphTo();
     }
 
-    public function scopeGetNotices($query, $idNotices)
+    public function post() {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function comment() {
+        return $this->belongsTo(Comment::class);
+    }
+
+    public function userFrom()
     {
-        return $query->where("id", $idNotices)->first();
+        return $this->belongsTo(User::class, 'from', 'id');
+    }
+
+    public function userTo()
+    {
+        return $this->belongsTo(User::class, 'to', 'id');
     }
 }

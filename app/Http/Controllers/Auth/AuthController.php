@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Auth\Events\Registered;
 use App\Models\Group;
+use App\Models\Post;
 
 class AuthController extends Controller
 {
@@ -20,8 +21,8 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $member = Group::findOrFail(39)->members()->where('type', 'request')->get()->pluck('user_id')->toArray();
-        dd($member);
+        $myGroups = Post::all();
+        dd($myGroups);
     }
 
     /**

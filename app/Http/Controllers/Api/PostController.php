@@ -39,10 +39,20 @@ class PostController extends ApiController
             'files', 'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
-            ->whereIn('user_id', $from)
             ->orderby('id', 'desc')
             ->where('audience', 'public')
             ->paginate(5);
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
+        ], 200);
+    }
+
+    public function listQueue($id)
+    {
+        $posts = Post::with(['user', 'user.profile', 'files', 'blocks'])->where('group_id', $id)->where('in_queue', 1)->get();
         return response()->json([
             'success' => true,
             'posts' => $posts,
@@ -55,7 +65,7 @@ class PostController extends ApiController
     {
         $myGroups = $this->currentUser()->members()->where('user_id', $this->currentUser()->id)->where('type', 'member')->get()->pluck('group_id')->toArray();
         $posts = Post::with([
-            'user', 'user.profile',
+            'files', 'user', 'user.profile', 'blocks'
         ])
             ->whereIn('group_id', $myGroups)
             ->orderby('id', 'desc')
@@ -88,7 +98,7 @@ class PostController extends ApiController
     public function indexPersonal()
     {
         $posts = $this->currentUser()->posts()->with([
-            'user', 'user.profile',
+            'files', 'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
             ->orderby('id', 'desc')
@@ -105,7 +115,7 @@ class PostController extends ApiController
     public function indexByPerson($id)
     {
         $posts = User::findOrFail($id)->posts()->with([
-            'user', 'user.profile',
+            'files', 'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
             ->orderby('id', 'desc')
@@ -156,7 +166,8 @@ class PostController extends ApiController
         }
     }
 
-    public function offComment($id) {
+    public function offComment($id)
+    {
         $post = Post::findOrFail($id);
         $post->off_comment = $post->off_comment == 0 ? 1 : 0;
         $post->save();
@@ -175,15 +186,23 @@ class PostController extends ApiController
         $post->user_id = $this->currentUser()->id;
         $post->audience = $request->audience;
         $post->text = $request->text;
-        $post->bg_image = $request->bg;
         $post->count_comment = 0;
         $post->count_reaction = 0;
         $post->group_id = $request->group_id;
         $post->off_comment = false;
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
-        for ($i = 0; $i < $request->count - 1; $i++) {
-            $file = 'file' . $i;
+        if ($request->file()) {
+            for ($i = 0; $i < $request->count - 1; $i++) {
+                $file = 'file' . $i;
+                $file_name = time() . '_' . $request->$file->getClientOriginalName();
+                $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
+                $post->files()->create([
+                    'path' => '/storage/' . $file_path,
+                    'type' => substr($request->$file->getClientMimeType(), 0, 5),
+                ]);
+            }
+            $file = 'file' . ($request->count - 1);
             $file_name = time() . '_' . $request->$file->getClientOriginalName();
             $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
             $post->files()->create([
@@ -191,13 +210,6 @@ class PostController extends ApiController
                 'type' => substr($request->$file->getClientMimeType(), 0, 5),
             ]);
         }
-        $file = 'file' . ($request->count - 1);
-        $file_name = time() . '_' . $request->$file->getClientOriginalName();
-        $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
-        $post->files()->create([
-            'path' => '/storage/' . $file_path,
-            'type' => substr($request->$file->getClientMimeType(), 0, 5),
-        ]);
         $post = Post::with(['files', 'user', 'user.profile', 'blocks'])->findOrFail($post->id);
         return response()->json([
             'success' => 'create post successfully.',
@@ -243,12 +255,16 @@ class PostController extends ApiController
             'videos' => $videos,
         ]);
     }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+
+    public function accept($id) {
+        $post = Post::findOrFail($id);
+        $post->in_queue = 0;
+        $post->save();
+        return response()->json([
+            'succes' => 'succes',
+        ]);
+    }
+
     public function destroy($id)
     {
         $this->currentUser()->posts()->findOrFail($id)->delete();
@@ -275,5 +291,14 @@ class PostController extends ApiController
             return view('app.post.posts', ['posts' => $friendPosts]);
         }
         return response()->json(['message' => 'Max'], 200);
+    }
+
+    public function search(Request $request) {
+        $posts = Post::with(['files', 'user', 'user.profile', 'blocks'])->where('text', 'LIKE', '%'.$request->text.'%')->get();
+        return response()->json([
+            'user' => User::with('profile')->findOrFail($this->currentUser()->id),
+            'data' => $posts,
+            'message' => 'success'
+        ]);
     }
 }

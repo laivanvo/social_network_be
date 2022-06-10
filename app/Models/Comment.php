@@ -53,4 +53,8 @@ class Comment extends Model
     {
         $query->orderBy('created_at', 'desc');
     }
+
+    public function notifications() {
+        return $this->hasMany(Notification::class);
+    }
 }

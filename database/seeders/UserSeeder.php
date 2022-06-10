@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Profile;
 
 class UserSeeder extends Seeder
 {
@@ -14,7 +15,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $users = User::factory()->count(100)->make();
-        User::upsert($users->toArray(), ['id']);
+        $users = User::factory()->count(100)->has(Profile::factory())->create();
     }
 }

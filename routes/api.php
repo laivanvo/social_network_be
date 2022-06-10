@@ -12,6 +12,10 @@ use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\SaveController;
+use App\Http\Controllers\Api\NotificationController;
+
+
 
 
 
@@ -46,9 +50,14 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts/byPerson/{id}', [PostController::class, 'indexByPerson'])->name('reactions.indexByPerson');
     Route::get('/posts/group/{id}', [PostController::class, 'indexGroup'])->name('reactions.indexGroup');
     Route::post('/posts', [PostController::class, 'store'])->name('post.store');
-    Route::post('/posts/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::get('/posts/destroy/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::get('/posts/accept/{id}', [PostController::class, 'accept'])->name('post.accept');
     Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
-    Route::get('/post/off_comment/{id}', [CommentController::class, 'offComment'])->name('Comment.offComment');
+    Route::get('/post/off_comment/{id}', [PostController::class, 'offComment'])->name('Comment.offComment');
+    Route::get('/posts/queue/{id}', [PostController::class, 'listQueue'])->name('post.inQueue');
+    Route::post('/posts/search', [PostController::class, 'search'])->name('post.search');
+
+
 
     Route::get('/relations/index/{id}', [RelationshipController::class, 'index'])->name('relationship.index');
     Route::get('/relations/check/{id}', [RelationshipController::class, 'check'])->name('relationship.check');
@@ -68,16 +77,17 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profiles/list', [ProfileController::class, 'list'])->name('profile.list');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profiles/search', [ProfileController::class, 'search'])->name('profile.search');
+
 
     Route::get('/groups', [GroupController::class, 'list'])->name('group.list');
     Route::get('/groups/show/{id}', [GroupController::class, 'show'])->name('group.show');
-    Route::get('/groups/me', [GroupController::class, 'listOfMe'])->name('group.listOfMe');
     Route::get('/groups/mec', [GroupController::class, 'listOfMeCurrent'])->name('group.listOfMeCurrent');
     Route::get('/groups/send', [GroupController::class, 'listSend'])->name('group.Send');
     Route::post('/groups', [GroupController::class, 'store'])->name('group.store');
     Route::get('/groups/join/{id}', [GroupController::class, 'joinGroup'])->name('group.join');
     Route::get('/groups/member/{id}', [GroupController::class, 'listMember'])->name('group.member');
-    Route::get('/groups/join', [GroupController::class, 'listJoin'])->name('join');
+    Route::get('/groups/listJoin', [GroupController::class, 'listJoin'])->name('group.listJoin');
 
     Route::get('members/index/{id}', [MemberController::class, 'listMember'])->name('member.listMember');
     Route::get('members/request/{id}', [MemberController::class, 'listRequest'])->name('member.listRequest');
@@ -90,4 +100,9 @@ Route::middleware(['api', 'auth:api'])->group(function () {
 
     Route::post('/blocks', [BlockController::class, 'store'])->name('blocks.store');
     Route::post('/blocks/destroy', [BlockController::class, 'destroy'])->name('blocks.destroy');
+
+    Route::get('/saves', [SaveController::class, 'index'])->name('save.index');
+    Route::get('/saves/store/{id}', [SaveController::class, 'store'])->name('save.store');
+
+    Route::get('/noties', [NotificationController::class, 'index'])->name('noti.index');
 });

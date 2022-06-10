@@ -2,17 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Block;
 use App\Models\File;
+use App\Models\Save;
 
 class Post extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
-
     private static $audiences = [
         'public' => 'Public',
         'private' => 'Private',
@@ -124,5 +120,14 @@ class Post extends Model
     public function files()
     {
         return $this->hasMany(File::class);
+    }
+
+    public function saves()
+    {
+        return $this->hasMany(Save::class);
+    }
+
+    public function notifications() {
+        return $this->hasMany(Notification::class);
     }
 }

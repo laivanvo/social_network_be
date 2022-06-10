@@ -9,6 +9,7 @@ use App\Models\Notification;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\Group;
+use App\Models\Save;
 
 class User extends Authenticatable implements MustVerifyEmail, JWTSubject
 {
@@ -210,5 +211,18 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
     public function blocks()
     {
         return $this->hasMany(Block::class);
+    }
+
+    public function saves()
+    {
+        return $this->hasMany(Save::class);
+    }
+
+    public function notificationsToMes() {
+        return $this->hasMany(Notification::class, 'to', 'id');
+    }
+
+    public function notificationsByMes() {
+        return $this->hasMany(Notification::class, 'from', 'id');
     }
 }

@@ -19,7 +19,7 @@ class ProfileController extends ApiController
 
     public function list()
     {
-        $profiles = Profile::where('user_id' , '<>', $this->currentUser()->id)->get();
+        $profiles = Profile::where('user_id', '<>', $this->currentUser()->id)->get();
         return response()->json([
             'success' => true,
             'profiles' => $profiles,
@@ -43,6 +43,16 @@ class ProfileController extends ApiController
         $profile->save();
         return response()->json([
             'profile' => $profile,
+            'success' => 'update profile successfully.'
+        ]);
+    }
+
+
+    public function search(Request $request)
+    {
+        $profiles = Profile::where('last_name', 'LIKE', '%' . $request->text . '%')->orWhere('first_name', 'LIKE', '%' . $request->text . '%')->get();
+        return response()->json([
+            'data' => $profiles,
             'success' => 'update profile successfully.'
         ]);
     }

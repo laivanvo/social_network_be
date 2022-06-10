@@ -38,8 +38,8 @@ class GroupController extends ApiController
 
     public function listJoin()
     {
-        $myGroups = $this->currentUser()->members()->where('user_id', $this->currentUser()->id)->where('type', 'member')->get()->pluck('group_id')->toArray();
-        $groups = Group::whereIn('id', $myGroups);
+        $myGroups = $this->currentUser()->members()->pluck('group_id')->toArray();
+        $groups = Group::whereIn('id', $myGroups)->get();
         return response()->json([
             'success' => true,
             'groups' => $groups,
@@ -57,7 +57,7 @@ class GroupController extends ApiController
 
     public function listOfMeCurrent()
     {
-        $myGroups = $this->currentUser()->groups()->with('user', 'user.profile')->take(10)->get();
+        $myGroups = Group::with('user', 'user.profile')->where('user_id', $this->currentUser()->id)->get();
         return response()->json([
             'success' => true,
             'groups' => $myGroups,
