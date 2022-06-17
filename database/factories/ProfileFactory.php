@@ -18,7 +18,7 @@ class ProfileFactory extends Factory
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'address' => $this->faker->address(),
-            'gender' => array_rand(array_flip(Profile::getGenders())),
+            'gender' => 'male',
             'birthday' => $this->faker->dateTime(),
             'phone_number' => $this->faker->e164PhoneNumber(),
             'avatar' => '/storage/uploads/1654844036_avatar.png'
