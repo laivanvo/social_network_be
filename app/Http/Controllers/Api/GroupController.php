@@ -20,7 +20,7 @@ class GroupController extends ApiController
      */
     public function list()
     {
-        $groups = Group::with('user', 'user.profile', 'members')->where('avatar', '<>', "")->get();
+        $groups = Group::with('user', 'user.profile', 'members')->where('avatar', '<>', "")->get()->take(10);
         return response()->json([
             'success' => true,
             'groups' => $groups,
@@ -29,7 +29,7 @@ class GroupController extends ApiController
 
     public function listOfMe()
     {
-        $myGroups = $this->currentUser()->groups()->with('user', 'user.profile')->get();
+        $myGroups = $this->currentUser()->groups()->with('user', 'user.profile', 'rules')->get()->take(10);
         return response()->json([
             'success' => true,
             'groups' => $myGroups,
@@ -39,7 +39,7 @@ class GroupController extends ApiController
     public function listJoin()
     {
         $myGroups = $this->currentUser()->members()->pluck('group_id')->toArray();
-        $groups = Group::whereIn('id', $myGroups)->get();
+        $groups = Group::whereIn('id', $myGroups)->get()->take(10);
         return response()->json([
             'success' => true,
             'groups' => $groups,
@@ -57,7 +57,7 @@ class GroupController extends ApiController
 
     public function listOfMeCurrent()
     {
-        $myGroups = Group::with('user', 'user.profile')->where('user_id', $this->currentUser()->id)->get();
+        $myGroups = Group::with('user', 'user.profile', 'rules', 'posts')->where('user_id', $this->currentUser()->id)->get()->take(10);
         return response()->json([
             'success' => true,
             'groups' => $myGroups,

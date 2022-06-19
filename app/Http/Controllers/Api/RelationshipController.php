@@ -200,4 +200,40 @@ class RelationshipController extends ApiController
             'success' => 'send request successfully.',
         ]);
     }
+
+    public function sameFriend($id) {
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from')->toArray();
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to')->toArray();
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+
+        $from1 = Relation::where('to', $id)->where('type', 'friend')->pluck('from')->toArray();
+        $to = Relation::where('from', $id)->where('type', 'friend')->pluck('to')->toArray();
+        if (!count($from1)) {
+            $from1 = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from1, $to[$i]);
+        }
+        $count = 0;
+        foreach ($from1 as $id) {
+            if (in_array($id, $from)) {
+                $count++;
+            }
+        }
+        return response()->json([
+            'success' => 'send request successfully.',
+            'count' => $count,
+        ]);
+    }
 }

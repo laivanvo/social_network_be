@@ -19,7 +19,8 @@ class ProfileController extends ApiController
 
     public function list()
     {
-        $profiles = Profile::where('user_id', '<>', $this->currentUser()->id)->get();
+        $from = $this->currentUser()->requestToMes()->where('type', 'request')->pluck('from')->toArray();
+        $profiles = Profile::where('user_id', '<>', $this->currentUser()->id)->whereNotIn('user_id', $from)->get();
         return response()->json([
             'success' => true,
             'profiles' => $profiles,

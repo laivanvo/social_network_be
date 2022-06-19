@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Save;
-
+use App\Models\User;
 
 class SaveController extends ApiController
 {
     public function index()
     {
-        $saves = Save::with(['user', 'user.profile', 'post', 'post.user', 'post.user.profile'])->where('user_id', $this->currentUser()->id)->get();
+        $saves = Save::with(['user', 'user.profile', 'post', 'post.files', 'post.user', 'post.user.profile'])->where('user_id', $this->currentUser()->id)->get();
         return response()->json([
-            'user' => $this->currentUser()->with('profile')->first(),
+            'user' => User::with('profile')->find($this->currentUser()->id),
             'saves' => $saves,
             'success' => 'send request successfully.'
         ]);

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Profile;
 
 class ProfileFactory extends Factory
 {
@@ -21,7 +20,7 @@ class ProfileFactory extends Factory
             'gender' => 'male',
             'birthday' => $this->faker->dateTime(),
             'phone_number' => $this->faker->e164PhoneNumber(),
-            'avatar' => '/storage/uploads/1654844036_avatar.png'
+            'avatar' => '/storage/uploads/1655655229_avatar.webp'
     ];
     }
 }

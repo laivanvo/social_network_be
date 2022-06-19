@@ -130,4 +130,8 @@ class Post extends Model
     public function notifications() {
         return $this->hasMany(Notification::class);
     }
+
+    public function group() {
+        return $this->belongsTo(Group::class);
+    }
 }

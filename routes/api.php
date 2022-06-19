@@ -44,7 +44,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
 
     Route::get('/posts/profile', [PostController::class, 'getProfile'])->name('post.profile');
     Route::get('/posts', [PostController::class, 'index'])->name('post.index');
-    Route::get('/posts/group', [PostController::class, 'listPostGroup'])->name('post.groups');
+    Route::get('/posts/groups', [PostController::class, 'listPostGroup'])->name('post.groups');
     Route::get('/posts/group/{id}', [PostController::class, 'listPostByGroup'])->name('post.listPostByGroup');
     Route::get('/posts/personal', [PostController::class, 'indexPersonal'])->name('reactions.indexPersonal');
     Route::get('/posts/byPerson/{id}', [PostController::class, 'indexByPerson'])->name('reactions.indexByPerson');
@@ -72,7 +72,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/relation/listSend', [RelationshipController::class, 'listSend'])->name('relationship.listSend');
     Route::get('/relations/listRequest', [RelationshipController::class, 'listRequest'])->name('relationship.listRequest');
     Route::get('/relations/listSuggest', [RelationshipController::class, 'listSuggest'])->name('relationship.listSuggest');
-
+    Route::get('/relations/sameFriend/{id}', [RelationshipController::class, 'sameFriend'])->name('relationship.sameFriend');
 
     Route::get('/profiles', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profiles/list', [ProfileController::class, 'list'])->name('profile.list');

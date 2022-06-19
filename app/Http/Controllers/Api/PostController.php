@@ -61,23 +61,6 @@ class PostController extends ApiController
         ], 200);
     }
 
-    public function listPostGroup()
-    {
-        $myGroups = $this->currentUser()->members()->where('user_id', $this->currentUser()->id)->where('type', 'member')->get()->pluck('group_id')->toArray();
-        $posts = Post::with([
-            'files', 'user', 'user.profile', 'blocks'
-        ])
-            ->whereIn('group_id', $myGroups)
-            ->orderby('id', 'desc')
-            ->take(5);
-        return response()->json([
-            'success' => true,
-            'posts' => $posts,
-            'user' => $this->currentUser(),
-            'profile' => $this->currentUser()->profile,
-        ], 200);
-    }
-
     public function listPostByGroup($id)
     {
         $group = Group::findOrFail($id);
@@ -98,7 +81,7 @@ class PostController extends ApiController
     public function indexPersonal()
     {
         $posts = $this->currentUser()->posts()->with([
-            'files', 'user', 'user.profile', 'blocks'
+            'files', 'user', 'user.profile', 'blocks', 'group',
         ])
             ->where('group_id', -1)
             ->orderby('id', 'desc')
@@ -132,7 +115,7 @@ class PostController extends ApiController
     public function indexGroup($id)
     {
         $posts = $this->currentUser()->posts()->with([
-            'user', 'user.profile',
+            'files', 'user', 'user.profile', 'blocks', 'group', 'group.user', 'group.user.profile'
         ])
             ->where('group_id', $id)
             ->orderby('id', 'desc')
@@ -143,6 +126,28 @@ class PostController extends ApiController
             'posts' => $posts,
             'user' => $this->currentUser(),
             'profile' => $profile,
+        ], 200);
+    }
+
+    public function listPostGroup()
+    {
+        $from = $this->currentUser()->groups()->pluck('id')->toArray();
+        $to = $this->currentUser()->members()->where('type', 'member')->pluck('group_id')->toArray();
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+        $posts = Post::with(['files', 'user', 'user.profile', 'blocks', 'group', 'group.user', 'group.user.profile'])->whereIn('group_id', $from)->get();
+        return response()->json([
+            'success' => true,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
         ], 200);
     }
 
@@ -220,28 +225,46 @@ class PostController extends ApiController
     public function update($id, Request $request)
     {
 
+
+
         // $request->validate([
         //     'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
         // ]);
 
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+        $post->file = '';
         $post->user_id = $this->currentUser()->id;
-        if ($request->file()) {
-            $file_name = time() . '_' . $request->file->getClientOriginalName();
-            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
-            $post->file = '/storage/' . $file_path;
-            $post->type = substr($request->file->getClientMimeType(), 0, 5);
-        } else {
-            $post->type = 'text';
-        }
         $post->audience = $request->audience;
         $post->text = $request->text;
-        $post->bg_image = $request->bg;
+        $post->count_comment = 0;
+        $post->count_reaction = 0;
+        $post->group_id = $request->group_id;
+        $post->off_comment = false;
+        $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
-        $post = Post::with(['user', 'user.profile',])->findOrFail($post->id);
+        $post->files()->delete();
+        if ($request->file()) {
+            for ($i = 0; $i < $request->count - 1; $i++) {
+                $file = 'file' . $i;
+                $file_name = time() . '_' . $request->$file->getClientOriginalName();
+                $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
+                $post->files()->create([
+                    'path' => '/storage/' . $file_path,
+                    'type' => substr($request->$file->getClientMimeType(), 0, 5),
+                ]);
+            }
+            $file = 'file' . ($request->count - 1);
+            $file_name = time() . '_' . $request->$file->getClientOriginalName();
+            $file_path = $request->file($file)->storeAs('uploads', $file_name, 'public');
+            $post->files()->create([
+                'path' => '/storage/' . $file_path,
+                'type' => substr($request->$file->getClientMimeType(), 0, 5),
+            ]);
+        }
+        $post = Post::with(['files', 'user', 'user.profile', 'blocks'])->findOrFail($post->id);
         return response()->json([
+            'success' => 'create post successfully.',
             'post' => $post,
-            'success' => 'create post successfully.'
         ]);
     }
 
@@ -256,7 +279,8 @@ class PostController extends ApiController
         ]);
     }
 
-    public function accept($id) {
+    public function accept($id)
+    {
         $post = Post::findOrFail($id);
         $post->in_queue = 0;
         $post->save();
@@ -293,8 +317,9 @@ class PostController extends ApiController
         return response()->json(['message' => 'Max'], 200);
     }
 
-    public function search(Request $request) {
-        $posts = Post::with(['files', 'user', 'user.profile', 'blocks'])->where('text', 'LIKE', '%'.$request->text.'%')->get();
+    public function search(Request $request)
+    {
+        $posts = Post::with(['files', 'user', 'user.profile', 'blocks'])->where('text', 'LIKE', '%' . $request->text . '%')->get();
         return response()->json([
             'user' => User::with('profile')->findOrFail($this->currentUser()->id),
             'data' => $posts,
