@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\ApiController;
 use App\Models\Profile;
 use Illuminate\Http\Request;
+use App\Models\Relation;
 
 class ProfileController extends ApiController
 {
@@ -53,8 +54,31 @@ class ProfileController extends ApiController
     {
         $profiles = Profile::where('last_name', 'LIKE', '%' . $request->text . '%')->orWhere('first_name', 'LIKE', '%' . $request->text . '%')->get();
         return response()->json([
-            'data' => $profiles,
-            'success' => 'update profile successfully.'
+            'profiles' => $profiles,
+            'success' => 'successfully.'
+        ]);
+    }
+
+    public function searchOfFriend(Request $request)
+    {
+
+        $from = Relation::where('to', $this->currentUser()->id)->where('type', 'friend')->pluck('from')->toArray();
+        $to = Relation::where('from', $this->currentUser()->id)->where('type', 'friend')->pluck('to')->toArray();
+        if (!count($from)) {
+            $from = [];
+        }
+        if (!count($to)) {
+            $to = [];
+        }
+        for ($i = 0; $i < count($to); $i++) {
+            array_push($from, $to[$i]);
+        }
+
+        $profiles = Profile::where('last_name', 'LIKE', '%' . $request->text . '%')
+            ->orWhere('first_name', 'LIKE', '%' . $request->text . '%')->whereIn('user_id', $from)->get();
+        return response()->json([
+            'profiles' => $profiles,
+            'success' => 'successfully.'
         ]);
     }
 }

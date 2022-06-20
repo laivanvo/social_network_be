@@ -194,7 +194,7 @@ class PostController extends ApiController
         $post->count_comment = 0;
         $post->count_reaction = 0;
         $post->group_id = $request->group_id;
-        $post->off_comment = false;
+        $post->off_comment = $request->off_comment;
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
         if ($request->file()) {
@@ -215,7 +215,7 @@ class PostController extends ApiController
                 'type' => substr($request->$file->getClientMimeType(), 0, 5),
             ]);
         }
-        $post = Post::with(['files', 'user', 'user.profile', 'blocks'])->findOrFail($post->id);
+        $post = Post::with(['files', 'user', 'user.profile', 'blocks', 'group', 'group.user', 'group.user.profile'])->findOrFail($post->id);
         return response()->json([
             'success' => 'create post successfully.',
             'post' => $post,
@@ -239,7 +239,6 @@ class PostController extends ApiController
         $post->count_comment = 0;
         $post->count_reaction = 0;
         $post->group_id = $request->group_id;
-        $post->off_comment = false;
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
         $post->files()->delete();
@@ -261,7 +260,7 @@ class PostController extends ApiController
                 'type' => substr($request->$file->getClientMimeType(), 0, 5),
             ]);
         }
-        $post = Post::with(['files', 'user', 'user.profile', 'blocks'])->findOrFail($post->id);
+        $post = Post::with(['files', 'user', 'user.profile', 'blocks', 'group', 'group.user', 'group.user.profile'])->findOrFail($post->id);
         return response()->json([
             'success' => 'create post successfully.',
             'post' => $post,
@@ -321,8 +320,9 @@ class PostController extends ApiController
     {
         $posts = Post::with(['files', 'user', 'user.profile', 'blocks'])->where('text', 'LIKE', '%' . $request->text . '%')->get();
         return response()->json([
-            'user' => User::with('profile')->findOrFail($this->currentUser()->id),
-            'data' => $posts,
+            'posts' => $posts,
+            'user' => $this->currentUser(),
+            'profile' => $this->currentUser()->profile,
             'message' => 'success'
         ]);
     }

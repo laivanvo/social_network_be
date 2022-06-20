@@ -53,7 +53,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts/destroy/{id}', [PostController::class, 'destroy'])->name('post.destroy');
     Route::get('/posts/accept/{id}', [PostController::class, 'accept'])->name('post.accept');
     Route::post('/post/{id}', [PostController::class, 'update'])->name('post.update');
-    Route::get('/post/off_comment/{id}', [PostController::class, 'offComment'])->name('Comment.offComment');
+    Route::get('/posts/off_comment/{id}', [PostController::class, 'offComment'])->name('Comment.offComment');
     Route::get('/posts/queue/{id}', [PostController::class, 'listQueue'])->name('post.inQueue');
     Route::post('/posts/search', [PostController::class, 'search'])->name('post.search');
 
@@ -78,6 +78,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/profiles/list', [ProfileController::class, 'list'])->name('profile.list');
     Route::post('/profiles', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profiles/search', [ProfileController::class, 'search'])->name('profile.search');
+    Route::post('/profiles/searchOfFriend', [ProfileController::class, 'searchOfFriend'])->name('profile.searchOfFriend');
 
 
     Route::get('/groups', [GroupController::class, 'list'])->name('group.list');

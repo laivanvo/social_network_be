@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Exceptions\ErrorException;
 use App\Models\Comment;
 use App\Models\Notification;
+use App\Models\Profile;
 use App\Models\Reaction;
 use Spatie\Valuestore\Valuestore;
 use Illuminate\Http\Request;
@@ -52,12 +53,13 @@ class CommentController extends ApiController
      */
     public function store(Request $request)
     {
+        $profile = Profile::where('user_id', $request->user_id)->first();
         if ($request->type != 'post') {
             $post_id = -1;
             $post_idz = $request->post;
             $comment_id = $request->comment_id;
             $comment_idz = $request->comment_id;
-            $content = 'user abc commented on your post';
+            $content = 'user ' . $profile->first_name . ' commented on your post';
             $commentz = Comment::findOrFail($request->comment_id);
             $commentz->count_rep++;
             $commentz->save();
@@ -66,7 +68,7 @@ class CommentController extends ApiController
             $post_idz = $request->post_id;
             $comment_id = -1;
             $comment_idz = -1;
-            $content = 'user abc commented on your post';
+            $content = 'user ' . $profile->first_name . ' commented on your post';
             $post = Post::findOrFail($request->post_id);
             $post->count_comment++;
             $post->save();
