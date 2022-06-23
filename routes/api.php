@@ -56,6 +56,7 @@ Route::middleware(['api', 'auth:api'])->group(function () {
     Route::get('/posts/off_comment/{id}', [PostController::class, 'offComment'])->name('Comment.offComment');
     Route::get('/posts/queue/{id}', [PostController::class, 'listQueue'])->name('post.inQueue');
     Route::post('/posts/search', [PostController::class, 'search'])->name('post.search');
+    Route::get('/posts/load/{id}', [PostController::class, 'load'])->name('post.load');
 
 
 

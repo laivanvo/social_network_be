@@ -327,4 +327,13 @@ class PostController extends ApiController
             'message' => 'success'
         ]);
     }
+
+    public function load($id) {
+        $post = Post::with([
+            'files', 'user', 'user.profile', 'blocks'
+            ])->where('id', $id)->first();
+        return response()->json([
+            'posts' => $post,
+        ]);
+    }
 }

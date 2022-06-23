@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiController;
+use App\Models\File;
 use App\Models\Post;
 use App\Models\FileUpload;
 use Illuminate\Http\Request;
@@ -27,7 +28,8 @@ class UserController extends ApiController
     }
 
     public function getImages($id) {
-        $images = User::findOrFail($id)->posts()->where('type', 'image')->pluck('file')->toArray();
+        $posts = User::findOrFail($id)->posts()->pluck('id')->toArray();
+        $images = File::whereIn('post_id', $posts)->get();
         return response()->json([
             'images' => $images,
             'success' => 'send request successfully.'
