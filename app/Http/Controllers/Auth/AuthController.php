@@ -21,8 +21,8 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $myGroups = Post::all();
-        dd($myGroups);
+        $a = ((sqrt(3) + 1/2) * ((1 + sqrt(3)) / (sqrt(3) - 1/2))) / (((1 + sqrt(3)) / sqrt(3) - 1/2) - 1/2);
+        dd($a);
     }
 
     /**

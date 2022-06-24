@@ -39,7 +39,8 @@ class PostController extends ApiController
             'files', 'user', 'user.profile', 'blocks'
         ])
             ->where('group_id', -1)
-            ->orderby('id', 'desc')
+            ->orderby('id', 'asc')
+            ->whereIn('user_id', $from)
             ->where('audience', 'public')
             ->paginate(5);
         return response()->json([
