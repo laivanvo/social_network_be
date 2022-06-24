@@ -237,8 +237,6 @@ class PostController extends ApiController
         $post->user_id = $this->currentUser()->id;
         $post->audience = $request->audience;
         $post->text = $request->text;
-        $post->count_comment = 0;
-        $post->count_reaction = 0;
         $post->group_id = $request->group_id;
         $post->in_queue = $request->in_queue == 'false' ? false : true;
         $post->save();
@@ -291,7 +289,10 @@ class PostController extends ApiController
 
     public function destroy($id)
     {
-        $this->currentUser()->posts()->findOrFail($id)->delete();
+        $post = Post::findOrFail($id);
+        $post->saves()->delete();
+        $post->delete();
+
         return response()->json(['success' => 'create post successfully.']);
     }
 
@@ -333,7 +334,7 @@ class PostController extends ApiController
             'files', 'user', 'user.profile', 'blocks'
             ])->where('id', $id)->first();
         return response()->json([
-            'posts' => $post,
+            'post' => $post,
         ]);
     }
 }

@@ -29,7 +29,7 @@ class UserController extends ApiController
 
     public function getImages($id) {
         $posts = User::findOrFail($id)->posts()->pluck('id')->toArray();
-        $images = File::whereIn('post_id', $posts)->get();
+        $images = File::whereIn('post_id', $posts)->where('type', 'image')->get();
         return response()->json([
             'images' => $images,
             'success' => 'send request successfully.'
@@ -37,7 +37,8 @@ class UserController extends ApiController
     }
 
     public function getVideos($id) {
-        $videos = User::findOrFail($id)->posts()->where('type', 'video')->pluck('file')->toArray();
+        $posts = User::findOrFail($id)->posts()->pluck('id')->toArray();
+        $videos = File::whereIn('post_id', $posts)->where('type', 'video')->get();
         return response()->json([
             'videos' => $videos,
             'success' => 'send request successfully.'
